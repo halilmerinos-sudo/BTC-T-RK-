@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
+<!--
+  BTC TÜRK KRİPTO CANLI
+  Lisans / Telif: © 2026 HALİL KILIÇ. Tüm hakları saklıdır.
+  Bu yazılımın izinsiz kopyalanması, çoğaltılması veya dağıtılması yasaktır.
+-->
 <head>
+<meta name="author" content="HALİL KILIÇ">
+<meta name="copyright" content="© 2026 HALİL KILIÇ">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,6 +24,8 @@ body{background:var(--bg);color:var(--txt);font-size:14px}
 .nav a{color:var(--sub);text-decoration:none;font-weight:600;padding:6px 4px;cursor:pointer}
 .nav a.active,.nav a:hover{color:var(--txt)}
 .clock{color:var(--sub);font-variant-numeric:tabular-nums;font-size:13px}
+.lic{background:#000;color:var(--sub);text-align:center;font-size:12px;padding:6px 10px;border-bottom:1px solid var(--line)}
+.lic b{color:var(--yellow);letter-spacing:.5px}
 .btn{background:var(--yellow);color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer}
 .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
 
@@ -83,18 +92,32 @@ tbody td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
 
 /* TÜM SATIRIN ANLIK YANIP SÖNME ANİMASYONU */
 tbody tr.crow {
-  transition: background-color 1s ease-out;
+  transition: none;
 }
 @keyframes rowFlashGreen {
-  0% { background-color: rgba(14, 203, 129, 0.45) !important; }
+  0% { background-color: rgba(14, 203, 129, 0.55); }
   100% { background-color: transparent; }
 }
 @keyframes rowFlashRed {
-  0% { background-color: rgba(246, 70, 93, 0.45) !important; }
+  0% { background-color: rgba(246, 70, 93, 0.55); }
   100% { background-color: transparent; }
 }
-tbody tr.flash-g { animation: rowFlashGreen 0.9s ease-out; }
-tbody tr.flash-r { animation: rowFlashRed 0.9s ease-out; }
+tbody tr.flash-g { animation: rowFlashGreen 1s ease-out; }
+tbody tr.flash-r { animation: rowFlashRed 1s ease-out; }
+@keyframes rowFlashBig { 0%,35% { background-color: rgba(167,139,250,.65); } 100% { background-color: transparent; } }
+@keyframes miFlashB { 0%,35% { background-color: rgba(167,139,250,.7); } 100% { background-color: var(--panel2); } }
+tbody tr.flash-b { animation: rowFlashBig 2.4s ease-out; }
+tbody tr.flash-b .bidc, tbody tr.flash-b .askc { color: var(--purple); font-weight: 800; }
+.mi.flash-b{animation:miFlashB 2.4s ease-out}
+.mprice.flash-b{animation:rowFlashBig 2.4s ease-out}
+@keyframes miFlashG { 0%{background-color:rgba(14,203,129,.55)} 100%{background-color:var(--panel2)} }
+@keyframes miFlashR { 0%{background-color:rgba(246,70,93,.55)} 100%{background-color:var(--panel2)} }
+.mi.flash-g{animation:miFlashG 1s ease-out}
+.mi.flash-r{animation:miFlashR 1s ease-out}
+.mprice.flash-g{animation:rowFlashGreen 1s ease-out}
+.mprice.flash-r{animation:rowFlashRed 1s ease-out}
+.bidc{color:var(--green)}.askc{color:var(--red)}
+.bidc,.askc,.price{font-variant-numeric:tabular-nums}
 
 tbody tr:hover{background:var(--panel2)}
 
@@ -120,7 +143,7 @@ tbody tr:hover{background:var(--panel2)}
   .btn{padding:7px 12px;font-size:13px}
   .wrap{margin:12px auto;padding:0 10px}
   .panels{grid-template-columns:1fr;gap:12px}
-  .vol{display:none}
+  .vol,.bidc,.askc{display:none}
   .sp svg{width:56px;height:24px}
   .pair .nm{display:none}
   .pair .sub{display:none}
@@ -153,7 +176,7 @@ tbody tr:hover{background:var(--panel2)}
 .mchart .ct{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--sub);margin:0 4px 6px}
 .mchart svg{display:block;width:100%;height:120px}
 .cwrap{position:relative}
-.pdot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--dotc,var(--green));animation:pulse 1.4s infinite;transition:top .4s linear}
+.pdot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--dotc,var(--green));animation:pulse 1.4s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}100%{box-shadow:0 0 0 10px rgba(255,255,255,0)}}
 .mchart .lv{font-variant-numeric:tabular-nums;font-weight:700}
 .mhd{font-size:12px;font-weight:700;margin:4px 0 8px;padding-left:7px;border-left:3px solid var(--yellow);color:var(--yellow)}
@@ -162,20 +185,22 @@ tbody tr:hover{background:var(--panel2)}
 .alarmbox button{background:var(--yellow);color:#000;border:none;border-radius:7px;padding:0 14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .mbtns{display:flex;gap:10px;margin-top:4px}
 .toast-wrap{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:300px;width:100%}
-.toast{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;box-shadow:0 10px 20px rgba(0,0,0,.4);animation:tin .3s ease;cursor:pointer}
+.toast{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;box-shadow:0 10px 20px rgba(0,0,0,.4);animation:tfade .25s ease;cursor:pointer}
 .toast.up{border-left:4px solid var(--green)}.toast.down{border-left:4px solid var(--red)}.toast.alarm{border-left:4px solid var(--yellow)}
 .toast .th{display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:3px}
 .toast .tbd{font-size:12px;color:var(--sub)}
-@keyframes tin{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tfade{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
 <div class="toast-wrap" id="toastWrap"></div>
+<div class="lic">Lisans: © 2026 <b>HALİL KILIÇ</b> · Tüm hakları saklıdır.</div>
 <div class="topbar">
   <div class="logo"><span class="b">BTC</span><span class="t">TÜRK</span></div>
   <div class="nav"><a class="active">Piyasalar</a></div>
   <span id="conn" style="font-size:12px;font-weight:700;color:var(--yellow)">● BAĞLANIYOR...</span>
   <div class="clock" id="clock">--:--:--</div>
+  <button class="btn ghost" id="helpBtn">ℹ️ Nasıl Çalışır?</button>
   <button class="btn ghost">Giriş Yap</button>
   <button class="btn">Kayıt Ol</button>
 </div>
@@ -219,7 +244,7 @@ tbody tr:hover{background:var(--panel2)}
     <div class="tabs"><span class="tab on" id="tabAll">Tümü</span><span class="tab" id="tabTRY">TRY</span><span class="tab" id="tabUSDT">USDT</span><span class="tab" id="tabFav">★ Favoriler</span></div>
   </div>
   <table>
-    <thead><tr><th></th><th>Çift</th><th>Son Fiyat</th><th>24s Değişim</th><th>Hacim</th><th>Grafik</th><th>İşlem</th></tr></thead>
+    <thead><tr><th></th><th>Çift</th><th>Son Fiyat</th><th class="bidc">Alış</th><th class="askc">Satış</th><th>24s Değişim</th><th>Hacim</th><th>Grafik</th><th>İşlem</th></tr></thead>
     <tbody id="tbody"></tbody>
   </table>
 </div>
@@ -321,6 +346,8 @@ function renderTable(){
         <td class="star ${favs.has(c.s)?'on':''}" data-fav="${c.s}">★</td>
         <td class="pair" data-open="${c.s}"><span class="ico">${c.s[0]}</span><b>${c.b}</b><span class="sub">/${c.q}</span><span class="nm">${c.n}</span><span class="alarm-icon">${c.alarm?' 🔔':''}</span></td>
         <td class="price">${fmtRaw(c.price)}</td>
+        <td class="bidc">${fmtRaw(c.bid)}</td>
+        <td class="askc">${fmtRaw(c.ask)}</td>
         <td class="chg ${up?'g':'r'}">${up?'+':''}${fmtPct(ch)}%</td>
         <td class="vol">${fmtVol(c.vb)} ${c.b}</td>
         <td class="sp">${spark(c.hist,up)}</td>
@@ -339,13 +366,15 @@ function renderTable(){
       });
     } else {
       if(c.flash) {
-        tr.classList.remove('flash-g', 'flash-r');
+        tr.classList.remove('flash-g', 'flash-r', 'flash-b');
         void tr.offsetWidth;
-        tr.classList.add(c.flash === 'up' ? 'flash-g' : 'flash-r');
+        tr.classList.add(c.flash === 'big' ? 'flash-b' : c.flash === 'up' ? 'flash-g' : 'flash-r');
         c.flash = null;
       }
 
       tr.querySelector('.price').textContent = fmtRaw(c.price);
+      tr.querySelector('.bidc').textContent = fmtRaw(c.bid);
+      tr.querySelector('.askc').textContent = fmtRaw(c.ask);
       const chgTd = tr.querySelector('.chg');
       chgTd.textContent = `${up?'+':''}${fmtPct(ch)}%`;
       chgTd.className = `chg ${up?'g':'r'}`;
@@ -535,6 +564,22 @@ async function seedChart(c){
     } catch(e){}
   }
 }
+const BIG_MOVE = 3;   // % — alış/satışta bu kadar ani değişimde mor renkle uyar
+function flashEl(el,dir){
+  if(!el) return;
+  el.classList.remove('flash-g','flash-r','flash-b');
+  void el.offsetWidth;
+  el.classList.add(dir === 'big' ? 'flash-b' : dir === 'up' ? 'flash-g' : 'flash-r');
+}
+function flashVal(id,val){
+  const el = document.getElementById(id); if(!el) return;
+  const prev = parseFloat(el.dataset.v);
+  el.dataset.v = val;
+  if(!isNaN(prev) && val !== prev){
+    const big = (id === 'dBid' || id === 'dAsk') && prev > 0 && Math.abs(val - prev) / prev * 100 >= BIG_MOVE;
+    flashEl(el.closest('.mi') || el.closest('.mprice'), big ? 'big' : (val > prev ? 'up' : 'down'));
+  }
+}
 function renderDetail(rebuild){
   if(!detailSym)return;
   const c=market.find(x=>x.s===detailSym);if(!c)return;
@@ -576,6 +621,7 @@ function renderDetail(rebuild){
   }
   const g=id=>document.getElementById(id);
   if(!g('dBig'))return;
+  flashVal('dBig',c.price);flashVal('dBid',bid);flashVal('dAsk',ask);flashVal('dLow',c.low);flashVal('dHigh',c.high);
   g('dBig').innerHTML=fmtRaw(c.price)+' <span>'+c.q+'</span>';g('dBig').className='big '+(up?'g':'r');
   g('dChg').textContent=(up?'▲ +':'▼ ')+fmtPct(ch)+'%';g('dChg').className='chg '+(up?'g':'r');
   
@@ -655,6 +701,7 @@ function processData(list){
     }
 
     c.prevPrice = c.price;
+    const oldBid = c.bid, oldAsk = c.ask;
     if(price > c.prevPrice) c.flash = 'up';
     else if(price < c.prevPrice) c.flash = 'down';
 
@@ -664,6 +711,13 @@ function processData(list){
     c.low = parseFloat(i.low || c.low);
     c.bid = parseFloat(i.bid || price);
     c.ask = parseFloat(i.ask || price);
+    const pctMove = (a,b) => b > 0 ? Math.abs(a - b) / b * 100 : 0;
+    if(pctMove(c.bid, oldBid) >= BIG_MOVE || pctMove(c.ask, oldAsk) >= BIG_MOVE){
+      c.flash = 'big';            // alış veya satışta %3+ değişim → ayrı renk
+    } else if(!c.flash){
+      if(c.bid > oldBid || c.ask > oldAsk) c.flash = 'up';
+      else if(c.bid < oldBid || c.ask < oldAsk) c.flash = 'down';
+    }
     c.vol = parseFloat(i.volume || c.vol);
     c.vb = parseFloat(i.volumeBase || c.vb);
     c.dp = parseFloat(i.dailyPercent !== undefined ? i.dailyPercent : c.dp);
@@ -846,6 +900,49 @@ window.addEventListener('online', () => { wsConnect(); fetchGlobalPrices(); });
 setInterval(()=>{
   if(Date.now() - lastOk > 12000) setConn(false);
 }, 1000);
+
+
+// ================= NASIL ÇALIŞIR PENCERESİ =================
+function showHelp(){
+  closeHelp();
+  const d = document.createElement('div');
+  d.className = 'modal'; d.id = 'helpModal'; d.style.zIndex = 200;
+  d.innerHTML = `<div class="mcard" style="max-width:560px">
+    <div class="mhead"><div class="mtit"><b>ℹ️ Sistem Nasıl Çalışır?</b></div><span class="close" id="helpX">✕</span></div>
+    <div style="font-size:13px;line-height:1.55;color:var(--txt)">
+      <div class="mhd">📡 Veri</div>
+      <p>Fiyatlar doğrudan <b>BtcTurk</b>'ten gelir. Ana kaynak BtcTurk WebSocket akışıdır (tüm TRY ve USDT çiftleri). Akış kesilirse sayfa otomatik yeniden bağlanır ve BtcTurk REST adresleri ile yedek kaynaklar sırayla denenir. Üstteki yazı hangi kaynağın ve kaç çiftin aktif olduğunu gösterir. Veri 12 saniye gelmezse kırmızı uyarı çıkar.</p>
+
+      <div class="mhd">🎨 Renkler</div>
+      <p><span style="color:var(--green)"><b>Yeşil yanıp sönme:</b></span> fiyat veya alış/satış yükseldi.<br>
+      <span style="color:var(--red)"><b>Kırmızı yanıp sönme:</b></span> fiyat veya alış/satış düştü.<br>
+      <span style="color:var(--purple)"><b>Mor (uzun) yanıp sönme:</b></span> alış veya satış tek seferde <b>%${BIG_MOVE} veya daha fazla</b> değişti. Hızlı ve ani hareket demektir.<br>
+      Değişen satır komple yanar ve yavaşça söner.</p>
+
+      <div class="mhd">📋 Tablo</div>
+      <p>Satıra veya Al/Sat düğmesine tıklayınca detay açılır. ★ ile favori eklersiniz. Üstteki sekmelerle Tümü / TRY / USDT / Favoriler arasında geçersiniz, arama kutusu coin adına göre süzer. Hacim, BtcTurk uygulamasındaki gibi coin cinsindendir.</p>
+
+      <div class="mhd">📈 Grafik ve RSI</div>
+      <p>Detay penceresindeki grafik son saatlerin dakikalık verisi ile canlı fiyatı birleştirir. Sağdaki yanıp sönen nokta anlık fiyattır. RSI (14) 70 üstünde aşırı alım, 30 altında aşırı satım eğilimi gösterir; yatırım tavsiyesi değildir.</p>
+
+      <div class="mhd">🔔 Alarm</div>
+      <p>Detayda hedef fiyat yazıp <b>Alarm Kur</b>'a basın (virgül veya nokta kullanabilirsiniz). Fiyat hedefe ulaşınca bip sesi, titreşim ve bildirim gelir; uyarıya dokununca ses durur. Alarmlar tarayıcıda saklanır. Alarmın çalışması için sayfanın açık olması gerekir.</p>
+
+      <div class="mhd">💰 Kâr / Zarar</div>
+      <p>Coin, miktar ve alış fiyatını girin; anlık fiyata göre kâr/zarar tutarı ve yüzdesi canlı hesaplanır.</p>
+
+      <div class="mhd">⚠️ Uyarı</div>
+      <p style="color:var(--sub)">Bu sayfa yalnızca bilgi amaçlıdır, alım-satım yapmaz ve yatırım tavsiyesi değildir. Veriler üçüncü taraf kaynaklardan gelir; gecikme veya hata olabilir.</p>
+
+      <p style="text-align:center;color:var(--sub);font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px">© 2026 <b style="color:var(--yellow)">HALİL KILIÇ</b> · Tüm hakları saklıdır.</p>
+    </div></div>`;
+  document.body.appendChild(d);
+  d.onclick = e => { if(e.target === d) closeHelp(); };
+  document.getElementById('helpX').onclick = closeHelp;
+}
+function closeHelp(){ const h = document.getElementById('helpModal'); if(h) h.remove(); }
+document.getElementById('helpBtn').onclick = showHelp;
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeHelp(); });
 
 // Sekmeler (Tümü / TRY / USDT / Favoriler)
 ['All','TRY','USDT','Fav'].forEach(n=>{
