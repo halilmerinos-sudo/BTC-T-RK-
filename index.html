@@ -227,6 +227,21 @@ tbody td{white-space:nowrap}
   .star{width:18px}
   .sp{display:none}
 }
+
+/* ===== Yatırım fırsatları ===== */
+.opp{background:var(--panel2);border-radius:10px;padding:11px 12px;margin-bottom:8px;min-width:0}
+.oh{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.oh b{font-size:15px}
+.ot{font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.oa{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.bg-g{background:rgba(14,203,129,.18);color:var(--green)}
+.bg-y{background:rgba(240,185,11,.18);color:var(--yellow)}
+.bg-n{background:rgba(132,142,156,.2);color:var(--sub)}
+.rk-h{background:rgba(246,70,93,.18);color:var(--red)}
+.rk-m{background:rgba(240,185,11,.14);color:var(--yellow)}
+.rk-l{background:rgba(14,203,129,.14);color:var(--green)}
+.clrbtn{cursor:pointer}
 </style>
 </head>
 <body>
@@ -246,6 +261,13 @@ tbody td{white-space:nowrap}
 
 <div class="wrap">
   <div class="panels">
+    <div class="card" style="grid-column:1/-1">
+      <div class="ctitle">🎯 Yatırım Fırsatları <span class="cnt" id="oppStat" style="margin-left:auto;font-weight:600">Analiz başlıyor…</span></div>
+      <div class="tabs" style="margin-bottom:10px;flex-wrap:wrap"><span class="tab on" id="oppTabS">⚡ Kısa Vade</span><span class="tab" id="oppTabL">🌱 Uzun Vade</span><span class="tab" id="oppTabP">📌 Takibim (0)</span></div>
+      <div id="oppBox"><div class="muted">Piyasa verisi ve geçmiş mumlar yükleniyor…</div></div>
+      <div class="muted" style="text-align:left;font-size:11px;padding:10px 2px 0;border-top:1px solid var(--line);margin-top:10px">⚠️ Teknik göstergelere dayalı otomatik tarama sonucudur, kesin getiri vaadi veya yatırım tavsiyesi değildir. Kripto varlıklar çok yüksek risk taşır; kaybetmeyi göze alabileceğiniz tutarla ve kendi araştırmanızla karar verin.</div>
+    </div>
+
     <div class="card">
       <div class="ctitle">🟣 %3+ Değişenler · Son 24 Saat <span class="cnt" id="bgCnt">0</span></div>
       <button class="btn" id="bgBtn" style="width:100%">📋 Listele</button>
@@ -291,7 +313,10 @@ let lastOk = Date.now();
 
 function parseNum(t){
   t = String(t == null ? '' : t).trim().replace(/\s/g,'');
-  if(t.indexOf(',') > -1 && t.indexOf('.') > -1) t = t.replace(/\./g,'');   // 1.234,56 -> 1234,56
+  const nd = (t.match(/\./g) || []).length, nc = (t.match(/,/g) || []).length;
+  if(nc > 0 && nd > 0) t = t.replace(/\./g,'');          // 1.234,56 -> 1234,56
+  else if(nd > 1) t = t.replace(/\./g,'');               // 3.300.000 -> 3300000
+  else if(nc > 1) t = t.replace(/,/g,'');                // 3,300,000 -> 3300000
   return parseFloat(t.replace(',', '.'));
 }
 function fmtVol(v){
@@ -655,10 +680,11 @@ function renderDetail(rebuild){
       <div class="alarmbox"><input type="text" inputmode="decimal" id="dAlarm" placeholder="Hedef fiyat (${c.q})"><button id="dAlarmBtn">Alarm Kur</button></div>
       <div style="margin:-6px 0 8px"><a href="#" id="dBeepTest" style="color:var(--yellow);font-size:12px">🔊 Sesi dene</a></div>
       <div id="dAlarmInfo" style="font-size:12px;color:var(--sub);margin-bottom:12px"></div>
-      <div class="mbtns"><button class="tbtn g big2">Al</button><button class="tbtn r big2">Sat</button></div>
+      <div class="mbtns"><button class="tbtn g big2">Al</button><button class="tbtn r big2">Sat</button><button class="tbtn big2" id="dTrack" style="background:rgba(240,185,11,.15);color:var(--yellow)">📌 Takibe Al</button></div>
     </div></div>`;
     document.getElementById('dmodal').onclick=e=>{if(e.target.id==='dmodal')closeDetail();};
     document.getElementById('dx').onclick=closeDetail;
+    document.getElementById('dTrack').onclick=()=>{unlockAudio();openTrackForm(c.s,'short');};
     document.getElementById('dBeepTest').onclick=e=>{e.preventDefault();unlockAudio();beepOnce();setTimeout(beepOnce,300);setTimeout(beepOnce,600);};
     document.getElementById('dAlarmBtn').onclick=()=>{
       unlockAudio();
@@ -872,6 +898,7 @@ function renderAll(){
   renderRanks();
   renderSignals();
   renderBig();
+  checkPositions();
   checkAlerts();
   renderDetail(false);
 }
@@ -879,6 +906,423 @@ function renderAll(){
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');},1000);
 document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');
 
+
+// ================= YATIRIM FIRSATLARI + TAKİP =================
+// Not: Teknik göstergelere dayalı otomatik tarama. Yatırım tavsiyesi değildir.
+const STABLES = new Set(['USDT','USDC','DAI','TUSD','FDUSD','BUSD','USDP','USDD','PYUSD']);
+const MIN_VOL = 250000, TOPN = 40;
+let an = {}, hc = {}, mood = {up:0, n:0, avg:0};
+let oppTab = 'short', oppMore = false, scanInfo = {done:0, total:0, ok:true, t:0};
+let histFail = 0, histPause = 0, gRoute = 0, workerOn = false;
+let positions = [];
+try { positions = JSON.parse(localStorage.getItem('btc_pos') || '[]') || []; } catch(e){}
+function savePos(){ try { localStorage.setItem('btc_pos', JSON.stringify(positions)); } catch(e){} }
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
+const mean = a => a.length ? a.reduce((x,y)=>x+y,0) / a.length : 0;
+const sdev = a => { if(a.length < 2) return 0; const m = mean(a); return Math.sqrt(mean(a.map(v => (v-m)*(v-m)))); };
+const retsOf = a => a.slice(1).map((v,i) => a[i] > 0 ? v / a[i] - 1 : 0);
+const smaN = (a,n) => a.length >= n ? mean(a.slice(-n)) : null;
+const chgN = (a,k) => a.length > k && a[a.length-1-k] > 0 ? (a[a.length-1] / a[a.length-1-k] - 1) * 100 : null;
+const AB = v => fmtPct(Math.abs(v));
+const halfRound = v => Math.round(v * 2) / 2;
+function rsiCalc(a,n){
+  n = n || 14;
+  if(a.length < n + 1) return null;
+  let g = 0, l = 0;
+  for(let i = 1; i <= n; i++){ const d = a[i] - a[i-1]; if(d >= 0) g += d; else l -= d; }
+  g /= n; l /= n;
+  for(let i = n + 1; i < a.length; i++){
+    const d = a[i] - a[i-1];
+    g = (g * (n-1) + Math.max(d,0)) / n;
+    l = (l * (n-1) + Math.max(-d,0)) / n;
+  }
+  return l === 0 ? 100 : 100 - 100 / (1 + g / l);
+}
+function hashStr(t){ let h = 2166136261; for(let i = 0; i < t.length; i++){ h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+// Aynı coin için metin 3 saat sabit kalır, sonra farklı kelimelerle yeniden kurulur
+function pickV(arr, key){ return arr[hashStr(key + Math.floor(Date.now() / 10800000)) % arr.length]; }
+function plain(v, q){ // alış fiyatı kutusu için virgüllü düz sayı
+  let t = Number(v).toFixed(v < 1 ? 8 : 2);
+  if(t.indexOf('.') > -1) t = t.replace(/0+$/,'').replace(/\.$/,'');
+  return t.replace('.', ',');
+}
+
+// ---------- veri ----------
+function volTRY(c){ if(c.q === 'TRY') return c.vol; const u = mkt['USDT']; return u ? c.vol * u.price : 0; }
+function candidates(){
+  const byBase = {};
+  market.forEach(c => {
+    if(STABLES.has(c.b) || (c.q !== 'TRY' && c.q !== 'USDT')) return;
+    const v = volTRY(c); if(!(v > 0) || !(c.price > 0)) return;
+    const cur = byBase[c.b];
+    if(!cur || (c.q === 'TRY' && cur.q !== 'TRY') || (c.q === cur.q && v > volTRY(cur))) byBase[c.b] = c;
+  });
+  return Object.values(byBase).filter(c => volTRY(c) >= MIN_VOL).sort((a,b) => volTRY(b) - volTRY(a));
+}
+async function gJson(u){
+  const routes = [x => x, x => 'https://corsproxy.io/?url=' + encodeURIComponent(x), x => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(x)];
+  for(let k = 0; k < routes.length; k++){
+    const i = (gRoute + k) % routes.length;
+    try {
+      const d = await fetchWithTimeout(routes[i](u), 6000);
+      if(d && Array.isArray(d.c) && d.c.length){ gRoute = i; return d; }
+    } catch(e){}
+  }
+  return null;
+}
+async function loadHist(c){
+  const now = Math.floor(Date.now() / 1000), sym = c.ps || (c.b + c.q);
+  const e = hc[c.s] || (hc[c.s] = {});
+  const needD = !e.td || Date.now() - e.td > 6 * 3600000;
+  const needH = !e.th || Date.now() - e.th > 20 * 60000;
+  let ok = true;
+  if(needD){
+    const d = await gJson(`https://graph-api.btcturk.com/v1/klines/history?symbol=${sym}&resolution=1440&from=${now - 100*86400}&to=${now}`);
+    if(d){ e.d = d.c.map(Number).filter(x => x > 0); e.td = Date.now(); } else ok = false;
+  }
+  if(needH){
+    const h = await gJson(`https://graph-api.btcturk.com/v1/klines/history?symbol=${sym}&resolution=60&from=${now - 60*3600}&to=${now}`);
+    if(h){ e.h = h.c.map(Number).filter(x => x > 0); e.hv = (h.v || []).map(Number); e.th = Date.now(); } else ok = false;
+  }
+  if(!ok) e.fail = Date.now();
+  return ok;
+}
+async function histWorker(){
+  if(workerOn) return; workerOn = true;
+  for(;;){
+    try {
+      if(Date.now() < histPause || !market.length){ await sleep(3000); continue; }
+      const list = candidates().slice(0, TOPN);
+      positions.forEach(p => { const c = mkt[p.s]; if(c && !list.includes(c)) list.push(c); });
+      const stale = c => { const e = hc[c.s]; return !e || !e.td || !e.th || Date.now() - e.td > 6*3600000 || Date.now() - e.th > 20*60000; };
+      scanInfo.total = list.length;
+      scanInfo.done = list.filter(c => !stale(c)).length;
+      const todo = list.find(c => stale(c) && !(hc[c.s] && hc[c.s].fail && Date.now() - hc[c.s].fail < 300000));
+      if(!todo){ await sleep(8000); continue; }
+      const ok = await loadHist(todo);
+      if(ok){ histFail = 0; scanInfo.ok = true; scanAll(); }
+      else if(++histFail >= 4){ scanInfo.ok = false; histPause = Date.now() + 600000; histFail = 0; scanAll(); }
+      await sleep(700);
+    } catch(e){ await sleep(3000); }
+  }
+}
+
+// ---------- analiz ----------
+function analyze(c, liq){
+  const e = hc[c.s] || {}, price = c.price, dp = c.dp || 0;
+  const rng = c.high - c.low, pos = rng > 0 ? clamp((price - c.low) / rng, 0, 1) : 0.5;
+  const spread = (c.ask > 0 && c.bid > 0) ? (c.ask - c.bid) / price * 100 : 0;
+  const H = e.h && e.h.length >= 20 ? e.h.slice(0,-1).concat(price) : null;
+  const D = e.d && e.d.length >= 30 ? e.d.slice(0,-1).concat(price) : null;
+  const m = {dp, pos, spread, liq, price, rsiH: null, r1: null, r6: null, hv: null, vs: null, hasH: !!H, hasD: !!D};
+  if(H){
+    m.rsiH = rsiCalc(H, 14); m.r1 = chgN(H,1); m.r6 = chgN(H,6);
+    m.hv = sdev(retsOf(H.slice(-48))) * 100;
+    if(e.hv && e.hv.length >= 30){
+      const rec = mean(e.hv.slice(-7,-1)), prev = mean(e.hv.slice(-49,-7));
+      m.vs = prev > 0 ? rec / prev : null;
+    }
+  }
+  // ---- kısa vade skoru ----
+  let s = 50;
+  if(dp >= 1 && dp <= 8) s += 12; else if(dp > 8 && dp <= 15) s += 4; else if(dp > 15) s -= 10;
+  else if(dp <= -3 && dp > -10) s -= 4; else if(dp <= -10) s -= 12;
+  if(m.rsiH != null){
+    const r = m.rsiH;
+    if(r >= 45 && r < 62) s += 10; else if(r >= 62 && r < 72) s += 2; else if(r >= 72) s -= 12;
+    else if(r >= 32) s += 3; else s += (m.r1 > 0 ? 8 : -2);
+  }
+  if(pos >= 0.45 && pos <= 0.85) s += 5; else if(pos > 0.92) s -= 6;
+  else if(pos < 0.15) s += ((m.r6 != null && m.r6 > 0) ? 6 : -8);
+  if(m.r6 != null){ if(m.r6 > 0) s += 6; if(m.r6 > 3) s += 2; if(m.r6 < -2) s -= 6; }
+  if(m.vs != null){ if(m.vs > 1.5) s += (m.r6 > 0 ? 8 : -8); else if(m.vs < 0.5) s -= 3; }
+  s += liq * 10;
+  if(spread > 1.5) s -= 10; else if(spread > 0.7) s -= 4;
+  if(m.hv != null && m.hv > 2.5) s -= 6;
+  const sc = Math.round(clamp(s, 0, 100));
+  // ---- uzun vade skoru ----
+  let L = null;
+  if(D){
+    const m20 = smaN(D,20), m50 = smaN(D,50);
+    const c7 = chgN(D,7), c30 = chgN(D,Math.min(30, D.length-1)), c90 = chgN(D, D.length-1);
+    const hi = Math.max.apply(null, D.slice(-90)), dd = (price / hi - 1) * 100;
+    const rsiD = rsiCalc(D, 14), dv = sdev(retsOf(D.slice(-60))) * 100;
+    let t = 45;
+    if(m50 != null){ if(price > m50) t += 12; else t -= 12; if(m20 > m50) t += 8; }
+    else { if(m20 != null && price > m20) t += 8; else t -= 6; }
+    if(c30 != null){ if(c30 >= 0 && c30 <= 30) t += 10; else if(c30 > 60) t -= 4; else if(c30 < -15) t -= 10; }
+    if(c90 != null){ if(c90 > 0) t += 6; else if(c90 < -30) t -= 10; }
+    if(dd <= -8 && dd >= -30 && m50 != null && price > m50) t += 6; else if(dd < -50) t -= 12;
+    if(rsiD != null){ if(rsiD >= 40 && rsiD <= 65) t += 6; else if(rsiD > 75) t -= 8; }
+    if(dv > 9) t -= 10; else if(dv > 5) t -= 3; else t += 4;
+    t += liq * 12;
+    L = {score: Math.round(clamp(t, 0, 100)), m20, m50, c7, c30, c90, dd, rsiD, dv, days: D.length};
+  }
+  const vol = L ? L.dv : (m.hv != null ? m.hv * 4.9 : Math.abs(dp));
+  const risk = (vol > 8 || liq < 0.25 || spread > 1.5) ? 'Yüksek' : (vol < 4 && liq > 0.6) ? 'Düşük' : 'Orta';
+  const out = {meta: m, risk, short: {score: sc}, long: L ? {score: L.score, d: L} : null};
+  out.short.text = narrShort(c, m, sc);
+  if(out.long) out.long.text = narrLong(c, m, L);
+  return out;
+}
+function label(s){ return s >= 72 ? 'Güçlü sinyal' : s >= 60 ? 'Olumlu' : s >= 48 ? 'Nötr' : 'Zayıf'; }
+
+// ---------- metin üretimi (verilere göre cümle kurar) ----------
+function narrShort(c, a, sc){
+  const b = c.b, k = c.s + 'S', fr = [];
+  const dpS = AB(a.dp);
+  if(a.dp >= 15) fr.push({w:9, t: pickV([`Son 24 saatte yaklaşık %${dpS} sıçrayarak dikkat çekiyor; bu kadar hızlı bir yükselişten sonra yeni giriş zirveye yakın alım riski taşıyor.`, `%${dpS}'lik günlük yükseliş etkileyici ama hareketin büyük kısmı yaşanmış olabilir, geri çekilme ihtimali masada.`], k+'1')});
+  else if(a.dp >= 8) fr.push({w:6, t: pickV([`24 saatte %${dpS} artışla güçlü bir ivme var, ancak hız arttıkça sert düzeltme olasılığı da büyüyor.`, `Günlük %${dpS} yükseliş alıcıların aktif olduğunu gösteriyor; yine de kovalamak yerine geri çekilme beklemek daha temkinli.`], k+'2')});
+  else if(a.dp >= 2) fr.push({w:5, t: pickV([`%${dpS}'lik günlük artış sağlıklı bölgede; fiyat aşırı ısınmadan yükseliyor.`, `Fiyat son 24 saatte %${dpS} yükselmiş, bu tempo sürdürülebilir görünüyor.`], k+'3')});
+  else if(a.dp > -2) fr.push({w:2, t: pickV([`Fiyat 24 saattir neredeyse yatay (%${AB(a.dp)} oynama); net bir yön henüz oluşmamış.`, `Günlük hareket çok sınırlı, piyasa karar vermeye çalışıyor gibi.`], k+'4')});
+  else if(a.dp > -8) fr.push({w:5, t: pickV([`Son 24 saatte %${dpS} geriledi; satıcılar baskın ama düşüş henüz kontrolden çıkmış değil.`, `%${dpS}'lik günlük kayıp, toparlanma sinyali gelmeden temkin gerektiriyor.`], k+'5')});
+  else fr.push({w:8, t: pickV([`24 saatte %${dpS} düşerek sert satış gördü; trend dönüşü net olmadan risk yüksek.`, `%${dpS}'lik sert düşüş var; dip arayışı cazip görünse de bu aşamada erken olabilir.`], k+'6')});
+  if(a.rsiH != null){
+    const r = Math.round(a.rsiH);
+    if(r >= 75) fr.push({w:8, t:`Saatlik RSI ${r} ile aşırı alım bölgesinde, kısa süreli soğuma sık görülen bir sonuç.`});
+    else if(r >= 62) fr.push({w:4, t:`Saatlik RSI ${r}; alıcı tarafı güçlü ama yükselmeye çok yer kalmamış olabilir.`});
+    else if(r >= 45) fr.push({w:4, t: pickV([`Saatlik RSI ${r} ile dengeli bölgede; hem yukarı hem aşağı hareket için alan var.`, `RSI ${r}, ne aşırı alım ne aşırı satım; momentum sağlıklı.`], k+'r')});
+    else if(r >= 32) fr.push({w:3, t:`Saatlik RSI ${r}; zayıf ama henüz aşırı satım değil.`});
+    else fr.push({w:7, t:`Saatlik RSI ${r} ile aşırı satımda; tepki alımı gelebilir ama düşüş sürerse bu da yanıltabilir.`});
+  }
+  if(a.pos < 0.15) fr.push({w:5, t:`Fiyat 24 saatlik aralığın en altına yakın (%${Math.round(a.pos*100)} seviyesinde), yani dip bölgesinde dolaşıyor.`});
+  else if(a.pos > 0.9) fr.push({w:5, t:`Günün en yükseğine çok yakın işlem görüyor; direnç testi yaşanabilir.`});
+  if(a.r6 != null){
+    if(a.dp < -2 && a.r6 > 1) fr.push({w:7, t:`Dikkat çekici nokta: gün genelinde düşüşte olmasına rağmen son 6 saatte %${AB(a.r6)} toparlanma var.`});
+    else if(a.dp > 2 && a.r6 < -1) fr.push({w:7, t:`Gün içinde yükselmişken son 6 saatte %${AB(a.r6)} geri verdi; ivme kaybı olabilir.`});
+    else if(a.r1 != null && Math.abs(a.r1) >= 1.5) fr.push({w:6, t:`Son 1 saatte %${AB(a.r1)} ${a.r1 > 0 ? 'yükseliş' : 'düşüş'} var, hareket hızlanıyor.`});
+  }
+  if(a.vs != null){
+    if(a.vs > 2) fr.push({w:6, t:`İşlem hacmi son saatlerde normalin yaklaşık ${a.vs.toFixed(1).replace('.',',')} katına çıkmış; hareket gerçek ilgiyle destekleniyor.`});
+    else if(a.vs > 1.4) fr.push({w:4, t:`Hacim ortalamanın üzerinde seyrediyor, bu da hareketi daha güvenilir kılıyor.`});
+    else if(a.vs < 0.5) fr.push({w:4, t:`Hacim belirgin şekilde zayıf; düşük ilgiyle gelen hareketler kolay geri döner.`});
+  }
+  if(a.spread > 1) fr.push({w:7, t:`Alış-satış farkı %${AB(a.spread)} ile geniş, işlem maliyeti kâr marjını yiyebilir.`});
+  else if(a.spread > 0.5) fr.push({w:3, t:`Alış-satış farkı biraz açık (%${AB(a.spread)}), emir verirken dikkat edin.`});
+  if(a.liq < 0.3) fr.push({w:5, t:`Hacmi piyasanın alt kademesinde olduğundan fiyat küçük emirlerle bile oynayabilir.`});
+  if(a.hv != null && a.hv > 2.2) fr.push({w:4, t:`Saatlik dalgalanma yüksek, fiyat kısa sürede iki yöne de sert gidebiliyor.`});
+  fr.sort((x,y) => y.w - x.w);
+  const op = sc >= 72 ? pickV([`${b} şu an kısa vade taramasında en güçlü adaylardan.`, `Kısa vadeli göstergelerin çoğu ${b} lehine hizalanmış.`, `${b} bugün diğer coinlerden olumlu ayrışıyor.`], k+'o')
+    : sc >= 60 ? pickV([`${b} izlemeye değer bir görünümde.`, `${b} için tablo olumlu ama kusursuz değil.`], k+'o')
+    : sc >= 48 ? pickV([`${b} şimdilik net bir fırsat sunmuyor.`, `${b} için sinyaller karışık.`], k+'o')
+    : pickV([`${b} şu an kısa vade için zayıf görünüyor.`, `${b} tarafında göstergeler temkin diyor.`], k+'o');
+  const body = fr.slice(0, 3).map(x => x.t).join(' ');
+  const stop = clamp(halfRound(a.hv != null ? a.hv * 4 : Math.abs(a.dp) * 0.6 + 3), 3, 10);
+  const sp = a.price * (1 - stop / 100);
+  const tail = sc >= 48 ? pickV([`Takibe alırsanız yaklaşık %${fmtPct(stop)} altı (${fmtRaw(sp)} ${c.q}) için zarar uyarısı kurmak makul olabilir.`, `Giriş düşünüyorsanız ${fmtRaw(sp)} ${c.q} civarını (yaklaşık %${fmtPct(stop)} aşağısı) uyarı seviyesi olarak belirleyebilirsiniz.`], k+'t') : '';
+  return [op, body, tail].filter(Boolean).join(' ');
+}
+function narrLong(c, a, L){
+  const b = c.b, k = c.s + 'L', fr = [];
+  if(L.m50 != null){
+    if(c.price > L.m50 && L.m20 > L.m50) fr.push({w:8, t: pickV([`Fiyat 50 günlük ortalamanın üzerinde ve kısa ortalama uzun ortalamayı yukarı kesmiş durumda, yani trend yukarı yönlü.`, `Hem 20 hem 50 günlük ortalamanın üstünde seyrediyor; orta vadeli trend alıcıdan yana.`], k+'1')});
+    else if(c.price > L.m50) fr.push({w:5, t:`50 günlük ortalamanın üzerinde ama kısa ortalama henüz güçlü bir teyit vermiyor.`});
+    else fr.push({w:8, t: pickV([`Fiyat 50 günlük ortalamanın altında; orta vadeli trend şu an zayıf.`, `Ortalamaların altında tutunuyor, trend dönmeden uzun vade için acele etmek riskli olabilir.`], k+'2')});
+  }
+  if(L.c30 != null){
+    if(L.c30 > 60) fr.push({w:7, t:`Son 30 günde yaklaşık %${AB(L.c30)} yükselmiş; bu kadar sert bir ralliden sonra dinlenme veya düzeltme sık yaşanır.`});
+    else if(L.c30 > 5) fr.push({w:5, t:`Son 30 günlük getiri %${AB(L.c30)} artı; yükseliş istikrarlı bir tempoda.`});
+    else if(L.c30 > -5) fr.push({w:3, t:`Son bir ayda yatay seyretmiş (%${fmtPct(L.c30)}), birikim ya da kararsızlık dönemi olabilir.`});
+    else fr.push({w:6, t:`Son 30 günde %${AB(L.c30)} kaybetmiş; düşüş eğilimi henüz kırılmış görünmüyor.`});
+  }
+  if(L.dd <= -50) fr.push({w:7, t:`90 günlük zirvesinin %${AB(L.dd)} altında; büyük bir değer kaybı var ve toparlanma uzun sürebilir.`});
+  else if(L.dd <= -10 && L.m50 != null && c.price > L.m50) fr.push({w:6, t:`90 günlük zirveden %${AB(L.dd)} geride olmasına rağmen trendini koruyor; bu tür geri çekilmeler uzun vadeli alımlarda aranan bir durum olabilir.`});
+  else if(L.dd > -3) fr.push({w:4, t:`Zirveye çok yakın işlem görüyor; kırılım gelebilir ama yeni giriş için fiyat pahalanmış sayılabilir.`});
+  if(L.rsiD != null){
+    const r = Math.round(L.rsiD);
+    if(r > 75) fr.push({w:6, t:`Günlük RSI ${r} ile aşırı ısınmış.`});
+    else if(r < 30) fr.push({w:5, t:`Günlük RSI ${r}; uzun süredir satış baskısı altında.`});
+    else fr.push({w:2, t:`Günlük RSI ${r} ile dengeli.`});
+  }
+  if(L.dv > 9) fr.push({w:6, t:`Günlük ortalama oynaklık %${AB(L.dv)}; uzun vadeli olsa bile yüksek risk, küçük pozisyon mantıklı.`});
+  else if(L.dv < 4) fr.push({w:3, t:`Oynaklığı görece düşük (günlük %${AB(L.dv)}), bu da uzun vadeli tutmayı kolaylaştırır.`});
+  if(a.liq > 0.8) fr.push({w:3, t:`Hacim bakımından piyasanın en likit coinlerinden, girip çıkmak kolay.`});
+  else if(a.liq < 0.3) fr.push({w:5, t:`Hacmi düşük olduğundan uzun vadede bile çıkış zor olabilir.`});
+  fr.sort((x,y) => y.w - x.w);
+  const sc = L.score;
+  const op = sc >= 72 ? pickV([`${b} uzun vade göstergelerinde öne çıkan adaylardan.`, `Uzun vadeli tablo ${b} için güçlü görünüyor.`], k+'o')
+    : sc >= 60 ? pickV([`${b} uzun vade için umut verici ama tam teyitli değil.`, `${b} orta-uzun vadede izlenmeye değer.`], k+'o')
+    : sc >= 48 ? pickV([`${b} uzun vadede nötr bölgede.`, `${b} için uzun vade sinyalleri belirsiz.`], k+'o')
+    : pickV([`${b} uzun vade için şu an cazip görünmüyor.`, `Uzun vadeli göstergeler ${b} için olumsuz.`], k+'o');
+  const stop = clamp(halfRound(L.dv * 2.5), 8, 25), sp = c.price * (1 - stop / 100);
+  const tail = sc >= 48 ? pickV([`Uzun vadeli takipte yaklaşık %${fmtPct(stop)} altı (${fmtRaw(sp)} ${c.q}) uyarı seviyesi olarak düşünülebilir.`, `Pozisyon alırsanız ${fmtRaw(sp)} ${c.q} altına sarkma durumunda planı yeniden değerlendirmek için bir uyarı kurabilirsiniz.`], k+'t') : '';
+  return [op, fr.slice(0,3).map(x => x.t).join(' '), tail].filter(Boolean).join(' ');
+}
+function moodText(){
+  if(!mood.n) return '';
+  const r = mood.up / mood.n, av = mood.avg;
+  if(r > 0.7) return `Piyasa genelinde coinlerin %${Math.round(r*100)}'i yükselişte (ortalama %${fmtPct(av)}); ortam alıcılı ama bu tür geniş yükselişlerde geç kalmamaya dikkat.`;
+  if(r < 0.3) return `Coinlerin yalnızca %${Math.round(r*100)}'i artıda (ortalama %${fmtPct(av)}); genel görünüm zayıf, bu yüzden net fırsat az.`;
+  return `Piyasa karışık: coinlerin %${Math.round(r*100)}'i artıda, ortalama değişim %${fmtPct(av)}; seçici olmak gereken bir dönem.`;
+}
+function scanAll(){
+  const list = candidates().slice(0, TOPN), n = list.length, out = {};
+  const ups = market.filter(c => c.q === 'TRY' && !STABLES.has(c.b));
+  mood = {n: ups.length, up: ups.filter(c => c.dp > 0).length, avg: mean(ups.map(c => c.dp || 0))};
+  list.forEach((c,i) => { out[c.s] = analyze(c, n > 1 ? 1 - i/(n-1) : 1); });
+  an = out; scanInfo.t = Date.now();
+  renderOpp();
+}
+
+// ---------- takip ve uyarılar ----------
+function posAnalysis(c){ return (an[c.s] && an[c.s].meta) || analyze(c, 0.5).meta; }
+function posNarr(p, c, pnl, kind){
+  const m = posAnalysis(c), b = c.b, k = p.s + p.t + kind;
+  const peakGain = (p.peak / p.entry - 1) * 100, fromPeak = (c.price / p.peak - 1) * 100;
+  const parts = [];
+  if(kind === 'trail'){
+    parts.push(pickV([`${b} girişinize göre +%${AB(peakGain)} zirveyi görüp ${AB(fromPeak)} puan geri çekildi.`, `Kâr korumada dikkat: ${b} zirveden %${AB(fromPeak)} aşağıda, kârınızın bir kısmı eriyor.`], k+'a'));
+    parts.push(pnl >= 0 ? `Şu an hâlâ %${AB(pnl)} kârdasınız.` : `Pozisyon artık %${AB(pnl)} zararda.`);
+  } else if(kind === 'pre'){
+    parts.push(pickV([`Erken uyarı: ${b} giriş fiyatınızın %${AB(pnl)} altında, zarar eşiğinize (%${fmtPct(p.warn)}) yaklaşıyor.`, `${b} aşağı yönlü; zarar %${AB(pnl)} oldu, eşiğiniz %${fmtPct(p.warn)}.`], k+'a'));
+  } else {
+    parts.push(pickV([`${b} alış fiyatınızın %${AB(pnl)} altına indi (alış ${fmtRaw(p.entry)}, şimdi ${fmtRaw(c.price)} ${c.q}).`, `Takipteki ${b} pozisyonunuz %${AB(pnl)} zararda, fiyat ${fmtRaw(c.price)} ${c.q}.`, `Dikkat: ${b} girişinize göre %${AB(pnl)} geride.`], k+'a'));
+    if(pnl <= -p.warn * 1.6) parts.push(`Belirlediğiniz %${fmtPct(p.warn)} eşiğinin epey ötesine geçildi.`);
+  }
+  if(m.r1 != null && m.r1 < -1.5) parts.push(`Son bir saatte %${AB(m.r1)} düşüş var, satış baskısı sürüyor olabilir.`);
+  else if(m.r6 != null && m.r6 > 0.5 && (m.r1 == null || m.r1 >= 0)) parts.push(`Buna karşın son saatlerde toparlanma izi var.`);
+  else if(m.dp < -5) parts.push(`24 saatlik görünüm de zayıf (%${AB(m.dp)} düşüş).`);
+  if(m.rsiH != null){
+    if(m.rsiH < 30) parts.push(`Saatlik RSI ${Math.round(m.rsiH)} ile aşırı satımda; tepki yükselişi gelebilir ama bu garanti değil.`);
+    else if(m.rsiH > 55 && kind !== 'trail') parts.push(`Saatlik RSI ${Math.round(m.rsiH)}, belirgin bir çöküş sinyali görünmüyor.`);
+  }
+  if(kind === 'trail') parts.push(pickV([`Kârı korumak istiyorsanız kısmi çıkış ya da uyarı seviyesini yukarı çekmek gibi seçenekler gündeme gelebilir.`, `Zirve geride kaldıysa kazancı kilitleme planınızı gözden geçirmek mantıklı olabilir.`], k+'tt'));
+  if(kind === 'loss') parts.push(p.hz === 'long'
+    ? pickV([`Uzun vadeli planda bu ölçekte geri çekilmeler görülebilir; yine de ilk giriş gerekçenizin geçerli olup olmadığını kontrol edin.`, `Uzun vadeli bakıyorsanız panik gerekmeyebilir ama pozisyon büyüklüğünüzü ve gerekçenizi gözden geçirmek iyi olur.`], k+'h')
+    : pickV([`Kısa vadeli bir plan yaptıysanız zarar sınırı yaklaştı ya da aşıldı; planınızı gözden geçirme zamanı olabilir.`, `Kısa vadede kayıplar hızlı büyüyebilir; önceden belirlediğiniz çıkış kuralını uygulamayı düşünün.`], k+'h'));
+  return parts.join(' ');
+}
+function fireAlert(p, c, pnl, kind){
+  const txt = posNarr(p, c, pnl, kind);
+  const title = (kind === 'trail' ? '🛡️ ' : kind === 'pre' ? '⚠️ ' : '🚨 ') + c.b + '/' + c.q + (kind === 'trail' ? ' Kâr Koruma' : kind === 'pre' ? ' Erken Uyarı' : ' Zarar Uyarısı');
+  toast('alarm', title, txt, kind !== 'pre');
+  if(kind !== 'pre'){
+    beep();
+    try { if('Notification' in window && Notification.permission === 'granted') new Notification(title, {body: txt}); } catch(e){}
+  }
+}
+function checkPositions(){
+  let ch = false;
+  positions.forEach(p => {
+    const c = mkt[p.s]; if(!c || !(c.price > 0)) return;
+    const pnl = (c.price / p.entry - 1) * 100;
+    if(c.price > p.peak){ p.peak = c.price; if(p.trail){ p.trail = false; ch = true; } }
+    const fromPeak = (c.price / p.peak - 1) * 100;
+    if(pnl <= -p.warn){
+      if(p.lastWarn == null || pnl <= p.lastWarn - 2){ p.lastWarn = pnl; ch = true; fireAlert(p, c, pnl, 'loss'); }
+    } else {
+      if(pnl <= -p.warn * 0.6 && !p.pre){ p.pre = true; ch = true; fireAlert(p, c, pnl, 'pre'); }
+      if(pnl > -p.warn * 0.3 && (p.pre || p.lastWarn != null)){ p.pre = false; p.lastWarn = null; ch = true; }
+    }
+    if((p.peak / p.entry - 1) * 100 >= p.warn && fromPeak <= -p.warn * 0.6 && !p.trail){ p.trail = true; ch = true; fireAlert(p, c, pnl, 'trail'); }
+  });
+  if(ch) savePos();
+}
+function closeTrack(){ const t = document.getElementById('trackModal'); if(t) t.remove(); }
+function openTrackForm(s, hz){
+  const c = mkt[s]; if(!c) return;
+  closeTrack();
+  hz = hz || 'short';
+  const d = document.createElement('div');
+  d.className = 'modal'; d.id = 'trackModal'; d.style.zIndex = 210;
+  d.innerHTML = `<div class="mcard" style="max-width:420px">
+    <div class="mhead"><div class="mtit"><b>📌 ${c.b}/${c.q} Takibe Al</b></div><span class="close" id="tkX">✕</span></div>
+    <label class="fl">Alış fiyatı (${c.q})</label><input type="text" inputmode="decimal" id="tkEntry" value="${plain(c.price)}">
+    <label class="fl" style="margin-top:8px">Miktar (isteğe bağlı)</label><input type="text" inputmode="decimal" id="tkAmt" placeholder="0">
+    <label class="fl" style="margin-top:8px">Vade</label>
+    <select id="tkHz"><option value="short" ${hz==='short'?'selected':''}>Kısa vade</option><option value="long" ${hz==='long'?'selected':''}>Uzun vade</option></select>
+    <label class="fl" style="margin-top:8px">Zarar uyarısı (%) — alış fiyatının bu kadar altına inerse uyar</label>
+    <input type="text" inputmode="decimal" id="tkWarn" value="${hz==='long'?'12':'5'}">
+    <div id="tkErr" style="color:var(--red);font-size:12px;margin-top:6px"></div>
+    <div class="mbtns" style="margin-top:12px"><button class="tbtn big2" id="tkOk" style="background:var(--yellow);color:#000">Takibe Al</button><button class="tbtn big2" id="tkNo" style="background:var(--panel2);color:var(--txt)">İptal</button></div>
+  </div>`;
+  document.body.appendChild(d);
+  d.onclick = e => { if(e.target === d) closeTrack(); };
+  document.getElementById('tkX').onclick = closeTrack;
+  document.getElementById('tkNo').onclick = closeTrack;
+  document.getElementById('tkHz').onchange = e => { document.getElementById('tkWarn').value = e.target.value === 'long' ? '12' : '5'; };
+  document.getElementById('tkOk').onclick = () => {
+    unlockAudio();
+    try { if('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch(e){}
+    const entry = parseNum(document.getElementById('tkEntry').value);
+    const amt = parseNum(document.getElementById('tkAmt').value) || 0;
+    const warn = parseNum(document.getElementById('tkWarn').value);
+    if(!(entry > 0)){ document.getElementById('tkErr').textContent = 'Geçerli bir alış fiyatı girin.'; return; }
+    if(!(warn > 0 && warn < 90)){ document.getElementById('tkErr').textContent = 'Uyarı yüzdesi 0 ile 90 arasında olmalı.'; return; }
+    positions.push({id: Date.now(), s, entry, amt, hz: document.getElementById('tkHz').value, warn, peak: Math.max(entry, c.price), lastWarn: null, pre: false, trail: false, t: Date.now()});
+    savePos(); closeTrack(); oppTab = 'pos'; renderOpp();
+    toast('up', '📌 Takibe alındı', c.b + '/' + c.q + ' için %' + fmtPct(warn) + ' zarar uyarısı kuruldu.');
+  };
+}
+
+// ---------- ekran ----------
+function renderOpp(){
+  const box = document.getElementById('oppBox'); if(!box) return;
+  [['S','short'],['L','long'],['P','pos']].forEach(([k,v]) => { const t = document.getElementById('oppTab' + k); if(t) t.classList.toggle('on', oppTab === v); });
+  const pc = document.getElementById('oppTabP'); if(pc) pc.textContent = '📌 Takibim (' + positions.length + ')';
+  const st = document.getElementById('oppStat');
+  if(st){
+    const tm = scanInfo.t ? new Date(scanInfo.t).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '—';
+    st.innerHTML = `Analiz: ${scanInfo.done}/${scanInfo.total} coin · güncelleme ${tm}` + (scanInfo.ok ? '' : ' · <span class="y">⚠ geçmiş veri alınamadı, yalnızca 24 saatlik verilerle (uzun vade kapalı)</span>');
+  }
+  if(oppTab === 'pos'){ box.innerHTML = renderPositions(); bindOpp(box); return; }
+  const key = oppTab === 'long' ? 'long' : 'short';
+  const arr = Object.keys(an).map(s => ({s, a: an[s][key], r: an[s].risk, c: mkt[s]})).filter(x => x.a && x.c).sort((x,y) => y.a.score - x.a.score);
+  const good = arr.filter(x => x.a.score >= 58);
+  const lim = oppMore ? 12 : 5;
+  let list = good.slice(0, lim), head = '';
+  if(!arr.length){
+    box.innerHTML = '<div class="muted">' + (key === 'long' && !scanInfo.ok ? 'Uzun vade analizi için geçmiş veri alınamadı.' : 'Piyasa verisi analiz ediliyor, geçmiş veriler yükleniyor...') + '</div>';
+    return;
+  }
+  if(!list.length){
+    list = arr.slice(0, 3);
+    head = `<div class="muted" style="text-align:left;padding:4px 2px 10px">Şu an ${key === 'long' ? 'uzun' : 'kısa'} vade için net bir fırsat görünmüyor. ${moodText()} En yakın adaylar aşağıda.</div>`;
+  } else if(moodText()) head = `<div class="muted" style="text-align:left;padding:2px 2px 10px">${moodText()}</div>`;
+  box.innerHTML = head + list.map(x => {
+    const sc = x.a.score, cls = sc >= 72 ? 'bg-g' : sc >= 60 ? 'bg-y' : 'bg-n', up = (x.c.dp || 0) >= 0;
+    return `<div class="opp"><div class="oh"><b>${x.c.b}/${x.c.q}</b><span class="badge ${cls}">${sc} · ${label(sc)}</span><span class="badge rk-${x.r === 'Yüksek' ? 'h' : x.r === 'Düşük' ? 'l' : 'm'}">Risk: ${x.r}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:700">${up ? '+' : ''}${fmtPct(x.c.dp || 0)}%</span></div><div class="ot">${x.a.text}</div><div class="oa"><button class="clrbtn" data-det="${x.s}">Detay</button><button class="clrbtn" data-trk="${x.s}" data-hz="${key}">📌 Takibe Al</button></div></div>`;
+  }).join('') + (good.length > 5 ? `<button class="clrbtn" id="oppMoreBtn" style="width:100%;margin-top:4px">${oppMore ? 'Daha az göster' : 'Daha fazla göster (' + Math.min(12, good.length) + ')'}</button>` : '');
+  bindOpp(box);
+}
+function renderPositions(){
+  if(!positions.length) return '<div class="muted" style="text-align:left">Henüz takipte coin yok. Fırsat listesinden veya detay penceresinden <b>📌 Takibe Al</b> diyerek ekleyin. Fiyat zarar eşiğinizin altına inerse sesli uyarı alırsınız.</div>';
+  return positions.map(p => {
+    const c = mkt[p.s]; if(!c) return '';
+    const pnl = (c.price / p.entry - 1) * 100, up = pnl >= 0;
+    const stopP = p.entry * (1 - p.warn / 100);
+    const status = pnl <= -p.warn ? '🚨 Zarar eşiği aşıldı' : pnl <= -p.warn * 0.6 ? '⚠️ Eşiğe yaklaşıyor' : up ? '✅ Kârda' : '🟡 Hafif zararda';
+    const note = pnl <= -p.warn * 0.6 ? posNarr(p, c, pnl, pnl <= -p.warn ? 'loss' : 'pre') : (up ? posStatus(p, c, pnl) : posStatus(p, c, pnl));
+    const amtTxt = p.amt > 0 ? ` · ${up ? '+' : ''}${fmtMoney((c.price - p.entry) * p.amt)} ${c.q}` : '';
+    return `<div class="opp"><div class="oh"><b>${c.b}/${c.q}</b><span class="badge ${p.hz === 'long' ? 'bg-y' : 'bg-n'}">${p.hz === 'long' ? 'Uzun vade' : 'Kısa vade'}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:800">${up ? '+' : ''}${fmtPct(pnl)}%${amtTxt}</span></div><div class="ot" style="color:var(--sub)">Alış ${fmtRaw(p.entry)} → şimdi ${fmtRaw(c.price)} ${c.q} · uyarı seviyesi ${fmtRaw(stopP)} (-%${fmtPct(p.warn)}) · ${status}</div><div class="ot">${note}</div><div class="oa"><button class="clrbtn" data-det="${p.s}">Detay</button><button class="clrbtn" data-del="${p.id}">✕ Takipten çıkar</button></div></div>`;
+  }).join('');
+}
+function posStatus(p, c, pnl){
+  const m = posAnalysis(c), b = c.b, k = p.s + p.id + 'st';
+  const bits = [];
+  if(pnl >= 0) bits.push(pickV([`${b} girişinizin %${AB(pnl)} üzerinde.`, `Pozisyon şu an %${AB(pnl)} kârda.`], k+'1'));
+  else bits.push(pickV([`${b} girişinizin %${AB(pnl)} altında, eşiğe henüz mesafe var.`, `Küçük bir zarar var (%${AB(pnl)}) ama kontrol dahilinde.`], k+'2'));
+  if(m.r1 != null && m.r1 < -1.5) bits.push(`Son saatte %${AB(m.r1)} düşüş olduğu için yakından izleyin.`);
+  else if(m.rsiH != null && m.rsiH > 70) bits.push(`Saatlik RSI ${Math.round(m.rsiH)} ile ısınmış; kâr varsa korumayı düşünebilirsiniz.`);
+  else if(m.dp < -5) bits.push(`24 saatlik değişim %${AB(m.dp)} negatif, dikkat.`);
+  else bits.push(`Şimdilik belirgin bir bozulma sinyali yok.`);
+  return bits.join(' ');
+}
+function bindOpp(box){
+  box.querySelectorAll('[data-det]').forEach(el => el.onclick = () => openDetail(el.dataset.det));
+  box.querySelectorAll('[data-trk]').forEach(el => el.onclick = () => openTrackForm(el.dataset.trk, el.dataset.hz));
+  box.querySelectorAll('[data-del]').forEach(el => el.onclick = () => { positions = positions.filter(p => String(p.id) !== el.dataset.del); savePos(); renderOpp(); });
+  const mb = document.getElementById('oppMoreBtn'); if(mb) mb.onclick = () => { oppMore = !oppMore; renderOpp(); };
+}
+[['S','short'],['L','long'],['P','pos']].forEach(([k,v]) => {
+  const t = document.getElementById('oppTab' + k);
+  if(t) t.onclick = () => { oppTab = v; oppMore = false; renderOpp(); };
+});
+setInterval(scanAll, 15000);
+setInterval(() => { if(oppTab === 'pos') renderOpp(); }, 2000);
+histWorker();
 
 // ================= BtcTurk WebSocket (CORS'a takılmaz, TÜM çiftler) =================
 let ws = null, wsLast = 0, wsRetry = 0, wsTimer = null, wsPending = {};
@@ -974,6 +1418,11 @@ function showHelp(){
 
       <div class="mhd">📈 Grafik ve RSI</div>
       <p>Detay penceresindeki grafik son saatlerin dakikalık verisi ile canlı fiyatı birleştirir. Sağdaki yanıp sönen nokta anlık fiyattır. RSI (14) 70 üstünde aşırı alım, 30 altında aşırı satım eğilimi gösterir; yatırım tavsiyesi değildir.</p>
+
+      <div class="mhd">🎯 Yatırım Fırsatları ve Takip</div>
+      <p>Sayfa, hacmi yüksek coinlerin son 100 günlük günlük ve son 60 saatlik saatlik mumlarını çekip RSI, ortalamalar, hacim artışı, zirveden uzaklık, oynaklık ve alış-satış farkını puanlar. <b>Kısa vade</b> saatler-günler, <b>uzun vade</b> haftalar-aylar için ayrı puan verir. Her coin için metin, o anki rakamlara göre yeniden yazılır. Puan 58 altındaysa listeye girmez.<br>
+      <b>📌 Takibe Al</b> ile aldığınız fiyatı ve zarar uyarı yüzdesini girersiniz (kısa vade için varsayılan %5, uzun vade %12). Fiyat eşiğe yaklaşınca erken uyarı, eşiğin altına inince sesli ve bildirimli uyarı gelir; zarar derinleştikçe tekrar uyarır. Kârdayken zirveden belirgin geri çekilme olursa kâr koruma uyarısı da verir. Takipler tarayıcıda saklanır, sayfanın açık olması gerekir.<br>
+      <span style="color:var(--sub)">Bunlar teknik sinyallerdir; yatırım tavsiyesi veya getiri garantisi değildir.</span></p>
 
       <div class="mhd">🔔 Alarm</div>
       <p>Detayda hedef fiyat yazıp <b>Alarm Kur</b>'a basın (virgül veya nokta kullanabilirsiniz). Fiyat hedefe ulaşınca bip sesi, titreşim ve bildirim gelir; uyarıya dokununca ses durur. Alarmlar tarayıcıda saklanır. Alarmın çalışması için sayfanın açık olması gerekir.</p>
