@@ -190,6 +190,43 @@ tbody tr:hover{background:var(--panel2)}
 .toast .th{display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:3px}
 .toast .tbd{font-size:12px;color:var(--sub)}
 @keyframes tfade{from{opacity:0}to{opacity:1}}
+
+/* ===== iPhone / dar ekran düzeltmeleri ===== */
+html{overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{max-width:100vw}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+tbody td{white-space:nowrap}
+.alarmbox input{min-width:0}
+@media(max-width:700px){
+  input,select{font-size:16px}
+  .lic{font-size:11px;padding:5px 8px}
+  .topbar{position:static;gap:8px}
+  .topbar .btn:not(#helpBtn){display:none}
+  #helpBtn{padding:6px 10px;font-size:12px}
+  .clock{font-size:12px}
+  #conn{flex:1 1 100%;order:4;font-size:11px;overflow-wrap:anywhere}
+  .stale-banner{top:0;font-size:12px;padding:8px 10px}
+  .wrap{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+  .bar{gap:10px}
+  .qbox{min-width:0;flex:1 1 100%}
+  .tabs{flex-wrap:wrap;gap:6px;width:100%}
+  .tab{flex:1 1 auto;text-align:center;padding:9px 8px;font-size:13px}
+  .tbtn{padding:6px 9px;font-size:13px;margin-right:3px}
+  .sp svg{width:48px}
+  .rkrow,.lgrow,.sgrow{gap:6px;font-size:12.5px;padding:7px 8px}
+  .rkrow .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mchart .ct{flex-wrap:wrap;gap:2px 8px}
+  .mprice{flex-wrap:wrap;gap:4px}
+  .mprice .big{font-size:22px;overflow-wrap:anywhere}
+  .mgrid{gap:8px}
+  .mi b{overflow-wrap:anywhere}
+  .alarmbox{flex-wrap:wrap}
+  .modal{padding:10px}
+}
+@media(max-width:380px){
+  .star{width:18px}
+  .sp{display:none}
+}
 </style>
 </head>
 <body>
@@ -210,17 +247,9 @@ tbody tr:hover{background:var(--panel2)}
 <div class="wrap">
   <div class="panels">
     <div class="card">
-      <div class="ctitle">💰 Kâr / Zarar Hesapla</div>
-      <label class="fl">Coin Seç</label>
-      <select id="pnlCoin"><option value="">— Coin seç —</option></select>
-      <div class="row2" style="margin-top:8px">
-        <div><label class="fl">Miktar (adet)</label><input type="text" inputmode="decimal" id="pnlAmt" placeholder="0"></div>
-        <div><label class="fl">Alış Fiyatı</label><input type="text" inputmode="decimal" id="pnlBuy" placeholder="0,00"></div>
-      </div>
-      <div class="pnlout">
-        <div><div class="lbl">Anlık Fiyat</div><div class="cur" id="pnlCur">—</div></div>
-        <div><div class="val y" id="pnlVal">Coin seçiniz</div><div class="pct" id="pnlPct"></div><div class="sub2" id="pnlSub"></div></div>
-      </div>
+      <div class="ctitle">🟣 %3+ Değişenler · Son 24 Saat <span class="cnt" id="bgCnt">0</span></div>
+      <button class="btn" id="bgBtn" style="width:100%">📋 Listele</button>
+      <div id="bgBox" style="margin-top:10px;display:none"></div>
     </div>
     <div class="card">
       <div class="ctitle">🏆 Canlı Sıralama</div>
@@ -243,15 +272,18 @@ tbody tr:hover{background:var(--panel2)}
     <div class="qbox"><input id="q" placeholder="Coin ara (örn. FB, BTC, GS, ETH)..."><span id="qClear" class="qx">✕</span></div>
     <div class="tabs"><span class="tab on" id="tabAll">Tümü</span><span class="tab" id="tabTRY">TRY</span><span class="tab" id="tabUSDT">USDT</span><span class="tab" id="tabFav">★ Favoriler</span></div>
   </div>
-  <table>
+  <div class="tscroll"><table>
     <thead><tr><th></th><th>Çift</th><th>Son Fiyat</th><th class="bidc">Alış</th><th class="askc">Satış</th><th>24s Değişim</th><th>Hacim</th><th>Grafik</th><th>İşlem</th></tr></thead>
     <tbody id="tbody"></tbody>
-  </table>
+  </table></div>
 </div>
 <div id="modalHost"></div>
 
 <script>
-let favs=new Set(), search="", tab='all', rankMode='up';
+let favs = new Set();
+try { favs = new Set(JSON.parse(localStorage.getItem('btc_favs') || '[]')); } catch(e){}
+function saveFavs(){ try { localStorage.setItem('btc_favs', JSON.stringify(Array.from(favs))); } catch(e){} }
+let search="", tab='all', rankMode='up';
 let alLog=[], sgList=[];
 let mkt={};      
 let market=[];   
@@ -358,6 +390,7 @@ function renderTable(){
       tr.querySelector('[data-fav]').onclick = (e) => {
         e.stopPropagation();
         favs.has(c.s)?favs.delete(c.s):favs.add(c.s);
+        saveFavs();
         renderTable();
       };
       tr.querySelectorAll('[data-open]').forEach(el => el.onclick = (e) => {
@@ -372,6 +405,8 @@ function renderTable(){
         c.flash = null;
       }
 
+      const stEl = tr.querySelector('.star');
+      if(stEl) stEl.classList.toggle('on', favs.has(c.s));
       tr.querySelector('.price').textContent = fmtRaw(c.price);
       tr.querySelector('.bidc').textContent = fmtRaw(c.bid);
       tr.querySelector('.askc').textContent = fmtRaw(c.ask);
@@ -395,8 +430,10 @@ function renderTable(){
     if(!rows.find(c => c.s === s)) tr.remove();
   });
 
+  Array.from(tb.querySelectorAll('tr:not([data-s])')).forEach(tr => tr.remove());
   if(!rows.length) {
-    tb.innerHTML = `<tr><td colspan=7 class="empty">${market.length?'Sonuç bulunamadı':'🔄 Piyasa verileri yükleniyor...'}</td></tr>`;
+    const msg = !market.length ? '🔄 Piyasa verileri yükleniyor...' : (tab==='fav' ? '★ Henüz favori yok. Bir coinin yanındaki yıldıza dokunun.' : 'Sonuç bulunamadı');
+    tb.innerHTML = `<tr><td colspan="9" class="empty">${msg}</td></tr>`;
   }
 }
 
@@ -417,29 +454,6 @@ function renderSignals(){
   const box=document.getElementById('sgBox');
   box.innerHTML=sgList.length?sgList.slice(0,12).map(x=>`<div class="sgrow" data-open="${x.s}"><span class="nm">${x.s}</span><span class="tag ${x.t}">${x.t==='ob'?'AŞIRI ALIM':'AŞIRI SATIM'} · RSI ${x.r}</span></div>`).join(''):'<div class="muted">Henüz sinyal yok</div>';
   box.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openDetail(el.dataset.open));
-}
-
-function buildPnlOptions(){
-  const sel=document.getElementById('pnlCoin');
-  if(sel.options.length-1===market.length)return;
-  const keep=sel.value;
-  sel.innerHTML='<option value="">— Coin seç —</option>'+market.map(c=>`<option value="${c.s}">${c.b}/${c.q}</option>`).join('');
-  sel.value=keep;
-}
-
-function calcPnl(){
-  const s=document.getElementById('pnlCoin').value;
-  const c=market.find(x=>x.s===s);
-  const cur=document.getElementById('pnlCur'),val=document.getElementById('pnlVal'),pct=document.getElementById('pnlPct'),sub=document.getElementById('pnlSub');
-  if(!c){cur.textContent='—';val.textContent='Coin seçiniz';val.className='val y';pct.textContent='';sub.textContent='';return;}
-  cur.textContent=fmtRaw(c.price)+' '+c.q;
-  const amt=parseNum(document.getElementById('pnlAmt').value)||0;
-  const buy=parseNum(document.getElementById('pnlBuy').value)||0;
-  if(amt<=0||buy<=0){val.textContent='Miktar & alış gir';val.className='val y';pct.textContent='';sub.textContent='';return;}
-  const diff=(c.price-buy)*amt,p=(c.price-buy)/buy*100,up=diff>=0;
-  val.textContent=(up?'+':'')+fmtMoney(diff)+' '+c.q;val.className='val '+(up?'g':'r');
-  pct.textContent=(up?'+':'')+fmtPct(p)+'%';pct.className='pct '+(up?'g':'r');
-  sub.textContent='Maliyet '+fmtMoney(buy*amt)+' → Güncel '+fmtMoney(c.price*amt)+' '+c.q;
 }
 
 let alarmStore = {};
@@ -564,6 +578,44 @@ async function seedChart(c){
     } catch(e){}
   }
 }
+let bigLog = {};
+try { bigLog = JSON.parse(localStorage.getItem('btc_biglog') || '{}') || {}; } catch(e){}
+function saveBig(){ try { localStorage.setItem('btc_biglog', JSON.stringify(bigLog)); } catch(e){} }
+let bigOpen = false, bigPage = 0;
+const BIG_PER = 8;
+function renderBig(){
+  const now = Date.now(), DAY = 24*3600*1000;
+  let pruned = false;
+  Object.keys(bigLog).forEach(k => { if(now - bigLog[k].t > DAY){ delete bigLog[k]; pruned = true; } });
+  if(pruned) saveBig();
+  const list = [];
+  market.forEach(c => {
+    const ch = c.dp || 0, ev = bigLog[c.s];
+    if(Math.abs(ch) >= BIG_MOVE || ev) list.push({c, ch, ev, k: Math.max(Math.abs(ch), ev ? ev.p : 0)});
+  });
+  list.sort((a,b) => b.k - a.k);
+  const cnt = document.getElementById('bgCnt'); if(cnt) cnt.textContent = list.length;
+  const btn = document.getElementById('bgBtn');
+  if(btn) btn.textContent = (bigOpen ? '🔽 Gizle' : '📋 Listele') + ' (' + list.length + ')';
+  const box = document.getElementById('bgBox');
+  if(!box) return;
+  box.style.display = bigOpen ? 'block' : 'none';
+  if(!bigOpen) return;
+  if(!list.length){ box.innerHTML = '<div class="muted">Son 24 saatte %' + BIG_MOVE + '+ değişen coin yok.</div>'; return; }
+  const pages = Math.max(1, Math.ceil(list.length / BIG_PER));
+  if(bigPage >= pages) bigPage = pages - 1;
+  if(bigPage < 0) bigPage = 0;
+  const view = list.slice(bigPage * BIG_PER, bigPage * BIG_PER + BIG_PER);
+  box.innerHTML = view.map(x => {
+    const up = x.ch >= 0;
+    const flag = x.ev ? ` <span title="Alış/satışta anlık %${BIG_MOVE}+ hareket" style="color:var(--purple)">⚡${new Date(x.ev.t).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>` : '';
+    return `<div class="rkrow" data-open="${x.c.s}"><span class="ico" style="width:20px;height:20px;font-size:10px">${x.c.b[0]}</span><span class="nm">${x.c.b}/${x.c.q}${flag}</span><span class="pr">${fmtRaw(x.c.price)}</span><span class="ch ${up?'g':'r'}">${up?'+':''}${fmtPct(x.ch)}%</span></div>`;
+  }).join('') + (pages > 1 ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px"><button class="clrbtn" id="bgPrev" ${bigPage===0?'disabled style="opacity:.4"':''}>◀ Önceki 8</button><span style="font-size:12px;color:var(--sub)">${bigPage+1} / ${pages}</span><button class="clrbtn" id="bgNext" ${bigPage>=pages-1?'disabled style="opacity:.4"':''}>Sonraki 8 ▶</button></div>` : '');
+  box.querySelectorAll('[data-open]').forEach(el => el.onclick = () => openDetail(el.dataset.open));
+  const pv = document.getElementById('bgPrev'), nx = document.getElementById('bgNext');
+  if(pv) pv.onclick = () => { bigPage--; renderBig(); };
+  if(nx) nx.onclick = () => { bigPage++; renderBig(); };
+}
 const BIG_MOVE = 3;   // % — alış/satışta bu kadar ani değişimde mor renkle uyar
 function flashEl(el,dir){
   if(!el) return;
@@ -651,9 +703,6 @@ document.getElementById('tabAll').onclick=()=>{tab='all';document.getElementById
 document.getElementById('tabFav').onclick=()=>{tab='fav';document.getElementById('tabFav').classList.add('on');document.getElementById('tabAll').classList.remove('on');renderTable();};
 document.getElementById('tbUp').onclick=()=>{rankMode='up';document.getElementById('tbUp').className='tb2 up';document.getElementById('tbDn').className='tb2';renderRanks();};
 document.getElementById('tbDn').onclick=()=>{rankMode='dn';document.getElementById('tbDn').className='tb2 dn';document.getElementById('tbUp').className='tb2';renderRanks();};
-document.getElementById('pnlCoin').onchange=calcPnl;
-document.getElementById('pnlAmt').oninput=calcPnl;
-document.getElementById('pnlBuy').oninput=calcPnl;
 document.getElementById('alClear').onclick=()=>{alLog=[];checkAlerts();};
 
 function setConn(ok){
@@ -714,6 +763,8 @@ function processData(list){
     const pctMove = (a,b) => b > 0 ? Math.abs(a - b) / b * 100 : 0;
     if(pctMove(c.bid, oldBid) >= BIG_MOVE || pctMove(c.ask, oldAsk) >= BIG_MOVE){
       c.flash = 'big';            // alış veya satışta %3+ değişim → ayrı renk
+      bigLog[c.s] = {t: Date.now(), p: Math.max(pctMove(c.bid, oldBid), pctMove(c.ask, oldAsk))};
+      saveBig();
     } else if(!c.flash){
       if(c.bid > oldBid || c.ask > oldAsk) c.flash = 'up';
       else if(c.bid < oldBid || c.ask < oldAsk) c.flash = 'down';
@@ -817,11 +868,10 @@ function schedule(){
 }
 
 function renderAll(){
-  buildPnlOptions();
   renderTable();
   renderRanks();
   renderSignals();
-  calcPnl();
+  renderBig();
   checkAlerts();
   renderDetail(false);
 }
@@ -928,8 +978,8 @@ function showHelp(){
       <div class="mhd">🔔 Alarm</div>
       <p>Detayda hedef fiyat yazıp <b>Alarm Kur</b>'a basın (virgül veya nokta kullanabilirsiniz). Fiyat hedefe ulaşınca bip sesi, titreşim ve bildirim gelir; uyarıya dokununca ses durur. Alarmlar tarayıcıda saklanır. Alarmın çalışması için sayfanın açık olması gerekir.</p>
 
-      <div class="mhd">💰 Kâr / Zarar</div>
-      <p>Coin, miktar ve alış fiyatını girin; anlık fiyata göre kâr/zarar tutarı ve yüzdesi canlı hesaplanır.</p>
+      <div class="mhd">🟣 %3+ Değişenler</div>
+      <p>Son 24 saatte günlük değişimi %${BIG_MOVE} veya üzeri olan coinleri, ayrıca alış/satışında anlık %${BIG_MOVE}+ hareket yakalanan coinleri (⚡ saat ile) listeler. <b>Listele</b> düğmesine basın, satıra dokununca detay açılır. Anlık hareket kaydı bu sayfa açıkken yakalanır ve 24 saat saklanır.</p>
 
       <div class="mhd">⚠️ Uyarı</div>
       <p style="color:var(--sub)">Bu sayfa yalnızca bilgi amaçlıdır, alım-satım yapmaz ve yatırım tavsiyesi değildir. Veriler üçüncü taraf kaynaklardan gelir; gecikme veya hata olabilir.</p>
@@ -943,6 +993,8 @@ function showHelp(){
 function closeHelp(){ const h = document.getElementById('helpModal'); if(h) h.remove(); }
 document.getElementById('helpBtn').onclick = showHelp;
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeHelp(); });
+
+document.getElementById('bgBtn').onclick = () => { bigOpen = !bigOpen; bigPage = 0; renderBig(); };
 
 // Sekmeler (Tümü / TRY / USDT / Favoriler)
 ['All','TRY','USDT','Fav'].forEach(n=>{
