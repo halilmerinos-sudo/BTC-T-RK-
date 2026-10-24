@@ -242,6 +242,35 @@ tbody td{white-space:nowrap}
 .rk-m{background:rgba(240,185,11,.14);color:var(--yellow)}
 .rk-l{background:rgba(14,203,129,.14);color:var(--green)}
 .clrbtn{cursor:pointer}
+.opp .mi{background:var(--panel)}
+.opp .mgrid{margin-bottom:0}
+.opp .mi b{font-size:13px}
+
+/* ===== Bilgi merkezi (butonlu paneller) ===== */
+.infobar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ibtn{position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--txt);cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0;font:inherit}
+.ibtn:hover{border-color:var(--sub)}
+.ibtn.on{border-color:var(--yellow);background:var(--panel2);box-shadow:0 0 0 1px var(--yellow) inset}
+.ibt{font-size:14px;font-weight:800}
+.ibd{font-size:11.5px;color:var(--sub);line-height:1.35}
+.ibc{position:absolute;top:10px;right:10px;background:var(--purple);color:#000;font-size:11px;font-weight:800;padding:1px 8px;border-radius:10px;min-width:22px;text-align:center}
+.infopanel{padding:16px 18px}
+.iph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.ipt{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.idesc{font-size:12.5px;color:var(--sub);line-height:1.55;margin-top:5px}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:8px}
+.glist .muted{grid-column:1/-1}
+.infopanel .rkrow,.infopanel .lgrow,.infopanel .sgrow{margin-bottom:0;padding:11px 13px;font-size:14px;border:1px solid transparent}
+.infopanel .rkrow:hover,.infopanel .lgrow:hover,.infopanel .sgrow:hover{border-color:var(--line)}
+.infopanel .tabs2{max-width:420px;margin-bottom:12px}
+.ot{font-size:14px;line-height:1.6}
+@media(max-width:700px){
+  .infobar{grid-template-columns:1fr 1fr;gap:8px}
+  .ibtn{padding:10px 11px}.ibt{font-size:13px}.ibd{font-size:11px}
+  .infopanel{padding:12px}
+  .glist{grid-template-columns:1fr}
+  .iph{flex-direction:column;gap:8px}
+}
 </style>
 </head>
 <body>
@@ -264,30 +293,42 @@ tbody td{white-space:nowrap}
     <div class="card" style="grid-column:1/-1">
       <div class="ctitle">🎯 Yatırım Fırsatları <span class="cnt" id="oppStat" style="margin-left:auto;font-weight:600">Analiz başlıyor…</span></div>
       <div class="tabs" style="margin-bottom:10px;flex-wrap:wrap"><span class="tab on" id="oppTabS">⚡ Kısa Vade</span><span class="tab" id="oppTabL">🌱 Uzun Vade</span><span class="tab" id="oppTabP">📌 Takibim (0)</span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;color:var(--sub)">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--txt)"><input type="checkbox" id="oppAlertChk" checked style="width:auto"> 🔔 Yeni fırsat gelince uyar</label>
+        <button class="clrbtn" id="oppRefresh">🔄 Şimdi yenile</button>
+        <span>Otomatik: tarama 15 sn · saatlik mumlar 20 dk · günlük mumlar 6 saat</span>
+      </div>
       <div id="oppBox"><div class="muted">Piyasa verisi ve geçmiş mumlar yükleniyor…</div></div>
       <div class="muted" style="text-align:left;font-size:11px;padding:10px 2px 0;border-top:1px solid var(--line);margin-top:10px">⚠️ Teknik göstergelere dayalı otomatik tarama sonucudur, kesin getiri vaadi veya yatırım tavsiyesi değildir. Kripto varlıklar çok yüksek risk taşır; kaybetmeyi göze alabileceğiniz tutarla ve kendi araştırmanızla karar verin.</div>
     </div>
 
-    <div class="card">
-      <div class="ctitle">🟣 %3+ Değişenler · Son 24 Saat <span class="cnt" id="bgCnt">0</span></div>
-      <button class="btn" id="bgBtn" style="width:100%">📋 Listele</button>
-      <div id="bgBox" style="margin-top:10px;display:none"></div>
+    <div class="infobar" style="grid-column:1/-1">
+      <button class="ibtn" data-p="big"><span class="ibc" id="ibBig">0</span><span class="ibt">🟣 %3+ Değişenler</span><span class="ibd">Son 24 saatte %3'ten fazla oynayanlar</span></button>
+      <button class="ibtn" data-p="rank"><span class="ibt">🏆 Canlı Sıralama</span><span class="ibd">En çok yükselen ve düşen coinler</span></button>
+      <button class="ibtn" data-p="log"><span class="ibc" id="ibLog">0</span><span class="ibt">⚡ Değişim Uyarıları</span><span class="ibd">Ani fiyat hareketlerinin kaydı</span></button>
+      <button class="ibtn" data-p="sig"><span class="ibc" id="ibSig">0</span><span class="ibt">📡 Teknik Sinyaller</span><span class="ibd">RSI: aşırı alım / aşırı satım</span></button>
     </div>
-    <div class="card">
-      <div class="ctitle">🏆 Canlı Sıralama</div>
+
+    <div class="card infopanel" data-panel="big" style="grid-column:1/-1;display:none">
+      <div class="iph"><div><div class="ipt">🟣 %3+ Değişenler · Son 24 Saat <span class="cnt" id="bgCnt">0</span></div><div class="idesc">Son 24 saatte fiyatı %3 veya daha fazla yükselen ya da düşen coinler. <b>⚡ saat</b> işareti, o coinin alış/satışında sayfa açıkken ani %3+ hareket yakalandığını gösterir. Satıra dokununca detay açılır.</div></div><button class="clrbtn" data-close>✕ Kapat</button></div>
+      <button class="btn" id="bgBtn" style="display:none">📋 Listele</button>
+      <div id="bgBox" class="glist"></div>
+    </div>
+    <div class="card infopanel" data-panel="rank" style="grid-column:1/-1;display:none">
+      <div class="iph"><div><div class="ipt">🏆 Canlı Sıralama</div><div class="idesc">Son 24 saatlik değişime göre en çok yükselen veya en çok düşen 10 coin. Satıra dokununca detay açılır.</div></div><button class="clrbtn" data-close>✕ Kapat</button></div>
       <div class="tabs2"><div class="tb2 up" id="tbUp">▲ En Çok Yükselen</div><div class="tb2" id="tbDn">▼ En Çok Düşen</div></div>
-      <div id="rankBox"></div>
+      <div id="rankBox" class="glist"></div>
     </div>
-    <div class="card">
-      <div class="ctitle">⚡ Değişim Uyarıları <span class="cnt" id="alCnt">0</span></div>
-      <label class="fl">Eşik (%) — bu orandan fazla oynayan coin bildirilir</label>
-      <input type="text" inputmode="decimal" id="alThr" value="1">
-      <div class="scroll" id="alLog" style="margin-top:10px"><div class="muted">Anlık değişimler burada listelenir...</div></div>
-      <button class="clrbtn" id="alClear" style="margin-top:8px">Temizle</button>
+    <div class="card infopanel" data-panel="log" style="grid-column:1/-1;display:none">
+      <div class="iph"><div><div class="ipt">⚡ Değişim Uyarıları <span class="cnt" id="alCnt">0</span></div><div class="idesc">Fiyatı bir önceki güncellemeye göre belirlediğiniz eşikten fazla oynayan coinler burada kayıt altına alınır (ekranda uyarı kutusu çıkmaz). Eşiği aşağıdan değiştirebilirsiniz.</div></div><button class="clrbtn" data-close>✕ Kapat</button></div>
+      <div style="max-width:260px;margin-bottom:10px"><label class="fl">Eşik (%) — bu orandan fazla oynayan coin kaydedilir</label>
+      <input type="text" inputmode="decimal" id="alThr" value="1"></div>
+      <div id="alLog" class="glist"><div class="muted">Anlık değişimler burada listelenir...</div></div>
+      <button class="clrbtn" id="alClear" style="margin-top:10px">Listeyi temizle</button>
     </div>
-    <div class="card">
-      <div class="ctitle">📡 Teknik Sinyaller (RSI) <span class="cnt" id="sgCnt">0</span></div>
-      <div class="scroll" id="sgBox"><div class="muted">Veri toplanıyor...</div></div>
+    <div class="card infopanel" data-panel="sig" style="grid-column:1/-1;display:none">
+      <div class="iph"><div><div class="ipt">📡 Teknik Sinyaller (RSI) <span class="cnt" id="sgCnt">0</span></div><div class="idesc">RSI, fiyatın kısa sürede aşırı yükselip yükselmediğini ölçer. <b class="r">70 ve üstü: aşırı alım</b> (düşüş riski artar), <b class="g">30 ve altı: aşırı satım</b> (tepki ihtimali artar). Sayfa açıkken toplanan canlı fiyatlardan hesaplanır, kesin sinyal değildir.</div></div><button class="clrbtn" data-close>✕ Kapat</button></div>
+      <div id="sgBox" class="glist"><div class="muted">Veri toplanıyor...</div></div>
     </div>
   </div>
   <div class="bar">
@@ -463,7 +504,7 @@ function renderTable(){
 }
 
 function renderRanks(){
-  const sorted=[...market].sort((a,b)=>(rankMode==='up' ? (b.dp - a.dp) : (a.dp - b.dp))).slice(0,8);
+  const sorted=[...market].sort((a,b)=>(rankMode==='up' ? (b.dp - a.dp) : (a.dp - b.dp))).slice(0,10);
   document.getElementById('rankBox').innerHTML=sorted.map((c,i)=>{
     const ch=c.dp||0, up=ch>=0;
     return `<div class="rkrow" data-open="${c.s}"><span class="rk">${i+1}</span><span class="ico" style="width:20px;height:20px;font-size:10px">${c.s[0]}</span><span class="nm">${c.s}</span><span class="pr">${fmtRaw(c.price)}</span><span class="ch ${up?'g':'r'}">${up?'+':''}${fmtPct(ch)}%</span></div>`;
@@ -560,7 +601,6 @@ function checkAlerts(){
         const up=d>=0;
         alLog.unshift({s:c.s,d,t:new Date().toLocaleTimeString('tr-TR'),up});
         if(alLog.length>60)alLog.pop();
-        toast(up?'up':'down',(up?'▲ ':'▼ ')+c.s,`Anlık ${up?'+':''}${fmtRaw(d)}% · ${fmtRaw(c.price)} ${c.q}`);
       }
     }
     if(c.alarm){
@@ -606,7 +646,7 @@ async function seedChart(c){
 let bigLog = {};
 try { bigLog = JSON.parse(localStorage.getItem('btc_biglog') || '{}') || {}; } catch(e){}
 function saveBig(){ try { localStorage.setItem('btc_biglog', JSON.stringify(bigLog)); } catch(e){} }
-let bigOpen = false, bigPage = 0;
+let bigOpen = true, bigPage = 0;
 const BIG_PER = 8;
 function renderBig(){
   const now = Date.now(), DAY = 24*3600*1000;
@@ -624,7 +664,7 @@ function renderBig(){
   if(btn) btn.textContent = (bigOpen ? '🔽 Gizle' : '📋 Listele') + ' (' + list.length + ')';
   const box = document.getElementById('bgBox');
   if(!box) return;
-  box.style.display = bigOpen ? 'block' : 'none';
+  box.style.display = bigOpen ? 'grid' : 'none';
   if(!bigOpen) return;
   if(!list.length){ box.innerHTML = '<div class="muted">Son 24 saatte %' + BIG_MOVE + '+ değişen coin yok.</div>'; return; }
   const pages = Math.max(1, Math.ceil(list.length / BIG_PER));
@@ -635,7 +675,7 @@ function renderBig(){
     const up = x.ch >= 0;
     const flag = x.ev ? ` <span title="Alış/satışta anlık %${BIG_MOVE}+ hareket" style="color:var(--purple)">⚡${new Date(x.ev.t).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>` : '';
     return `<div class="rkrow" data-open="${x.c.s}"><span class="ico" style="width:20px;height:20px;font-size:10px">${x.c.b[0]}</span><span class="nm">${x.c.b}/${x.c.q}${flag}</span><span class="pr">${fmtRaw(x.c.price)}</span><span class="ch ${up?'g':'r'}">${up?'+':''}${fmtPct(x.ch)}%</span></div>`;
-  }).join('') + (pages > 1 ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px"><button class="clrbtn" id="bgPrev" ${bigPage===0?'disabled style="opacity:.4"':''}>◀ Önceki 8</button><span style="font-size:12px;color:var(--sub)">${bigPage+1} / ${pages}</span><button class="clrbtn" id="bgNext" ${bigPage>=pages-1?'disabled style="opacity:.4"':''}>Sonraki 8 ▶</button></div>` : '');
+  }).join('') + (pages > 1 ? `<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-top:6px"><button class="clrbtn" id="bgPrev" ${bigPage===0?'disabled style="opacity:.4"':''}>◀ Önceki 8</button><span style="font-size:12px;color:var(--sub)">${bigPage+1} / ${pages}</span><button class="clrbtn" id="bgNext" ${bigPage>=pages-1?'disabled style="opacity:.4"':''}>Sonraki 8 ▶</button></div>` : '');
   box.querySelectorAll('[data-open]').forEach(el => el.onclick = () => openDetail(el.dataset.open));
   const pv = document.getElementById('bgPrev'), nx = document.getElementById('bgNext');
   if(pv) pv.onclick = () => { bigPage--; renderBig(); };
@@ -898,6 +938,7 @@ function renderAll(){
   renderRanks();
   renderSignals();
   renderBig();
+  updateInfoCounts();
   checkPositions();
   checkAlerts();
   renderDetail(false);
@@ -1163,6 +1204,7 @@ function scanAll(){
   mood = {n: ups.length, up: ups.filter(c => c.dp > 0).length, avg: mean(ups.map(c => c.dp || 0))};
   list.forEach((c,i) => { out[c.s] = analyze(c, n > 1 ? 1 - i/(n-1) : 1); });
   an = out; scanInfo.t = Date.now();
+  detectNew();
   renderOpp();
 }
 
@@ -1221,28 +1263,29 @@ function checkPositions(){
   if(ch) savePos();
 }
 function closeTrack(){ const t = document.getElementById('trackModal'); if(t) t.remove(); }
-function openTrackForm(s, hz){
+function openTrackForm(s, hz, editId){
   const c = mkt[s]; if(!c) return;
   closeTrack();
-  hz = hz || 'short';
+  const ed = editId ? positions.find(x => String(x.id) === String(editId)) : null;
+  hz = ed ? ed.hz : (hz || 'short');
   const d = document.createElement('div');
   d.className = 'modal'; d.id = 'trackModal'; d.style.zIndex = 210;
   d.innerHTML = `<div class="mcard" style="max-width:420px">
-    <div class="mhead"><div class="mtit"><b>📌 ${c.b}/${c.q} Takibe Al</b></div><span class="close" id="tkX">✕</span></div>
-    <label class="fl">Alış fiyatı (${c.q})</label><input type="text" inputmode="decimal" id="tkEntry" value="${plain(c.price)}">
-    <label class="fl" style="margin-top:8px">Miktar (isteğe bağlı)</label><input type="text" inputmode="decimal" id="tkAmt" placeholder="0">
+    <div class="mhead"><div class="mtit"><b>${ed ? '✏️ Düzenle' : '📌 Takibe Al'} · ${c.b}/${c.q}</b></div><span class="close" id="tkX">✕</span></div>
+    <label class="fl">Alış fiyatı (${c.q})</label><input type="text" inputmode="decimal" id="tkEntry" value="${plain(ed ? ed.entry : c.price)}">
+    <label class="fl" style="margin-top:8px">Miktar (${c.b}) — girerseniz maliyet, değer ve kâr/zarar tutarı gösterilir</label><input type="text" inputmode="decimal" id="tkAmt" placeholder="örn: 1000" value="${ed && ed.amt > 0 ? plain(ed.amt) : ''}">
     <label class="fl" style="margin-top:8px">Vade</label>
     <select id="tkHz"><option value="short" ${hz==='short'?'selected':''}>Kısa vade</option><option value="long" ${hz==='long'?'selected':''}>Uzun vade</option></select>
     <label class="fl" style="margin-top:8px">Zarar uyarısı (%) — alış fiyatının bu kadar altına inerse uyar</label>
-    <input type="text" inputmode="decimal" id="tkWarn" value="${hz==='long'?'12':'5'}">
+    <input type="text" inputmode="decimal" id="tkWarn" value="${ed ? plain(ed.warn) : (hz==='long'?'12':'5')}">
     <div id="tkErr" style="color:var(--red);font-size:12px;margin-top:6px"></div>
-    <div class="mbtns" style="margin-top:12px"><button class="tbtn big2" id="tkOk" style="background:var(--yellow);color:#000">Takibe Al</button><button class="tbtn big2" id="tkNo" style="background:var(--panel2);color:var(--txt)">İptal</button></div>
+    <div class="mbtns" style="margin-top:12px"><button class="tbtn big2" id="tkOk" style="background:var(--yellow);color:#000">${ed ? 'Kaydet' : 'Takibe Al'}</button><button class="tbtn big2" id="tkNo" style="background:var(--panel2);color:var(--txt)">İptal</button></div>
   </div>`;
   document.body.appendChild(d);
   d.onclick = e => { if(e.target === d) closeTrack(); };
   document.getElementById('tkX').onclick = closeTrack;
   document.getElementById('tkNo').onclick = closeTrack;
-  document.getElementById('tkHz').onchange = e => { document.getElementById('tkWarn').value = e.target.value === 'long' ? '12' : '5'; };
+  if(!ed) document.getElementById('tkHz').onchange = e => { document.getElementById('tkWarn').value = e.target.value === 'long' ? '12' : '5'; };
   document.getElementById('tkOk').onclick = () => {
     unlockAudio();
     try { if('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch(e){}
@@ -1251,10 +1294,71 @@ function openTrackForm(s, hz){
     const warn = parseNum(document.getElementById('tkWarn').value);
     if(!(entry > 0)){ document.getElementById('tkErr').textContent = 'Geçerli bir alış fiyatı girin.'; return; }
     if(!(warn > 0 && warn < 90)){ document.getElementById('tkErr').textContent = 'Uyarı yüzdesi 0 ile 90 arasında olmalı.'; return; }
-    positions.push({id: Date.now(), s, entry, amt, hz: document.getElementById('tkHz').value, warn, peak: Math.max(entry, c.price), lastWarn: null, pre: false, trail: false, t: Date.now()});
+    const hzv = document.getElementById('tkHz').value;
+    if(ed){
+      Object.assign(ed, {entry, amt, warn, hz: hzv, peak: Math.max(ed.peak, entry), lastWarn: null, pre: false, trail: false});
+    } else {
+      positions.push({id: Date.now(), s, entry, amt, hz: hzv, warn, peak: Math.max(entry, c.price), lastWarn: null, pre: false, trail: false, t: Date.now()});
+    }
     savePos(); closeTrack(); oppTab = 'pos'; renderOpp();
-    toast('up', '📌 Takibe alındı', c.b + '/' + c.q + ' için %' + fmtPct(warn) + ' zarar uyarısı kuruldu.');
   };
+}
+
+// ---------- yeni fırsat uyarısı ----------
+const OPP_MIN = 58, OPP_COOLDOWN = 3 * 3600000;
+let oppActive = {}, oppNewAt = {}, oppBase = true, oppStart = Date.now();
+let oppSeen = {};
+try { oppSeen = JSON.parse(localStorage.getItem('btc_opp_seen') || '{}') || {}; } catch(e){}
+let oppAlertOn = true;
+try { oppAlertOn = localStorage.getItem('btc_opp_alert') !== '0'; } catch(e){}
+function shortText(t, n){
+  if(t.length <= n) return t;
+  const cut = t.slice(0, n), i = cut.lastIndexOf('. ');
+  return i > 60 ? cut.slice(0, i + 1) : cut + '…';
+}
+function detectNew(){
+  const now = Date.now(), fresh = [];
+  Object.keys(an).forEach(s => {
+    const A = an[s], c = mkt[s]; if(!A || !c) return;
+    [['short', A.short, A.meta.hasH], ['long', A.long, A.meta.hasD]].forEach(([k, x, has]) => {
+      if(!x || !has) return;
+      const key = s + ':' + k;
+      if(x.score >= OPP_MIN){
+        if(!oppActive[key]){
+          oppActive[key] = true;
+          if(!oppBase && !(oppSeen[key] && now - oppSeen[key] < OPP_COOLDOWN)){
+            oppSeen[key] = now; oppNewAt[key] = now;
+            fresh.push({s, c, k, x});
+          }
+        }
+      } else if(x.score < OPP_MIN - 6){ delete oppActive[key]; }
+    });
+  });
+  // ilk yükleme bitene kadar mevcut fırsatlar sessizce kaydedilir
+  if(oppBase && ((scanInfo.total > 0 && scanInfo.done >= scanInfo.total) || now - oppStart > 180000 || !scanInfo.ok)) oppBase = false;
+  if(fresh.length){
+    try { localStorage.setItem('btc_opp_seen', JSON.stringify(oppSeen)); } catch(e){}
+    fireOpp(fresh);
+  }
+}
+function fireOpp(fresh){
+  if(!oppAlertOn) return;
+  fresh.sort((a,b) => b.x.score - a.x.score);
+  const top = fresh.slice(0, 3);
+  top.forEach((f, i) => {
+    const title = `🎯 Yeni fırsat (${f.k === 'long' ? 'uzun' : 'kısa'} vade): ${f.c.b}/${f.c.q} · ${f.x.score} ${label(f.x.score)}`;
+    let body = shortText(f.x.text, 260) + ' Fırsatlar kartından 📌 Takibe Al diyebilirsiniz.';
+    if(i === top.length - 1 && fresh.length > 3) body += ` (+${fresh.length - 3} yeni fırsat daha)`;
+    toast('alarm', title, body, true);
+    try { if('Notification' in window && Notification.permission === 'granted') new Notification(title, {body}); } catch(e){}
+  });
+  beepOnce(); setTimeout(beepOnce, 300);
+  try { if(navigator.vibrate) navigator.vibrate([200,100,200]); } catch(e){}
+}
+function refreshNow(){
+  Object.keys(hc).forEach(k => { hc[k].th = 0; hc[k].td = 0; hc[k].fail = 0; });
+  histPause = 0; scanInfo.ok = true; histFail = 0;
+  scanAll();
 }
 
 // ---------- ekran ----------
@@ -1283,20 +1387,94 @@ function renderOpp(){
   } else if(moodText()) head = `<div class="muted" style="text-align:left;padding:2px 2px 10px">${moodText()}</div>`;
   box.innerHTML = head + list.map(x => {
     const sc = x.a.score, cls = sc >= 72 ? 'bg-g' : sc >= 60 ? 'bg-y' : 'bg-n', up = (x.c.dp || 0) >= 0;
-    return `<div class="opp"><div class="oh"><b>${x.c.b}/${x.c.q}</b><span class="badge ${cls}">${sc} · ${label(sc)}</span><span class="badge rk-${x.r === 'Yüksek' ? 'h' : x.r === 'Düşük' ? 'l' : 'm'}">Risk: ${x.r}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:700">${up ? '+' : ''}${fmtPct(x.c.dp || 0)}%</span></div><div class="ot">${x.a.text}</div><div class="oa"><button class="clrbtn" data-det="${x.s}">Detay</button><button class="clrbtn" data-trk="${x.s}" data-hz="${key}">📌 Takibe Al</button></div></div>`;
+    const nAt = oppNewAt[x.s + ':' + key], isNew = nAt && Date.now() - nAt < 1800000;
+    return `<div class="opp"><div class="oh"><b>${x.c.b}/${x.c.q}</b>${isNew ? '<span class="badge" style="background:var(--purple);color:#000">🆕 YENİ</span>' : ''}<span class="badge ${cls}">${sc} · ${label(sc)}</span><span class="badge rk-${x.r === 'Yüksek' ? 'h' : x.r === 'Düşük' ? 'l' : 'm'}">Risk: ${x.r}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:700">${up ? '+' : ''}${fmtPct(x.c.dp || 0)}%</span></div><div class="ot">${x.a.text}</div><div class="oa"><button class="clrbtn" data-det="${x.s}">Detay</button><button class="clrbtn" data-trk="${x.s}" data-hz="${key}">📌 Takibe Al</button></div></div>`;
   }).join('') + (good.length > 5 ? `<button class="clrbtn" id="oppMoreBtn" style="width:100%;margin-top:4px">${oppMore ? 'Daha az göster' : 'Daha fazla göster (' + Math.min(12, good.length) + ')'}</button>` : '');
   bindOpp(box);
 }
+function durTxt(ms){
+  const m = Math.max(0, Math.floor(ms / 60000));
+  if(m < 60) return m + ' dk';
+  const h = Math.floor(m / 60);
+  if(h < 24) return h + ' sa ' + (m % 60) + ' dk';
+  return Math.floor(h / 24) + ' gün ' + (h % 24) + ' sa';
+}
+function tryEq(v, q){ const u = mkt['USDT']; return (q === 'USDT' && u && u.price > 0) ? ` (≈ ${fmtMoney(v * u.price)} TRY)` : ''; }
+function sgn(v){ return v >= 0 ? '+' : '-'; }
+function entryChart(c, p, stopP){
+  const data = chartData(c);
+  if(!data || data.length < 2) return '';
+  const w = 420, ht = 90, pd = 6;
+  const all = data.concat([p.entry, stopP]);
+  let mn = Math.min.apply(null, all), mx = Math.max.apply(null, all);
+  if(mx === mn){ mx += 1; mn -= 1; }
+  const Y = v => ht - pd - ((v - mn) / (mx - mn)) * (ht - pd * 2);
+  const X = i => pd + i / (data.length - 1) * (w - pd * 2);
+  const up = c.price >= p.entry, col = up ? 'var(--green)' : 'var(--red)';
+  const pts = data.map((v,i) => X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join(' ');
+  const ln = (v, cl) => `<line x1="${pd}" x2="${w-pd}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="${cl}" stroke-width="1" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`;
+  return `<svg viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none" style="display:block;width:100%;height:90px;margin:8px 0 2px">${ln(p.entry,'var(--yellow)')}${ln(stopP,'var(--red)')}<polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${pts}"/></svg><div style="font-size:10px;color:var(--sub);display:flex;gap:12px;flex-wrap:wrap"><span><span class="y">- -</span> alış</span><span><span class="r">- -</span> uyarı seviyesi</span><span><span style="color:${col}">━</span> fiyat</span></div>`;
+}
+function amountBlock(p, c, stopP){
+  const b = c.b, q = c.q, amt = p.amt;
+  if(!(amt > 0)) return `<div class="ot" style="color:var(--sub);margin-top:8px">Miktar girmediğiniz için TL/USDT karşılığı hesaplanmıyor. <b>✏️ Düzenle</b> ile miktar ekleyebilirsiniz.</div>`;
+  const cost = p.entry * amt, val = c.price * amt, diff = val - cost, pnl = (c.price / p.entry - 1) * 100;
+  const bidVal = (c.bid > 0 ? c.bid : c.price) * amt;
+  const peakVal = p.peak * amt, gave = peakVal - val;
+  const stopVal = stopP * amt, stopLoss = stopVal - cost;
+  const k = p.s + p.id + 'am';
+  const line1 = diff >= 0
+    ? pickV([`${fmtRaw(amt)} ${b} için maliyetiniz ${fmtMoney(cost)} ${q} idi; şu an değeri ${fmtMoney(val)} ${q} ve ${fmtMoney(diff)} ${q} (%${AB(pnl)}) kâr gösteriyor.`, `Girişteki ${fmtMoney(cost)} ${q} şimdi ${fmtMoney(val)} ${q} değerinde: ${fmtMoney(diff)} ${q} fazla (%${AB(pnl)}).`], k+'1')
+    : pickV([`${fmtRaw(amt)} ${b} için ödediğiniz ${fmtMoney(cost)} ${q} şu an ${fmtMoney(val)} ${q} değerinde; ${fmtMoney(Math.abs(diff))} ${q} (%${AB(pnl)}) açık var.`, `Maliyet ${fmtMoney(cost)} ${q} iken değer ${fmtMoney(val)} ${q} oldu, yani ${fmtMoney(Math.abs(diff))} ${q} zarar (%${AB(pnl)}).`], k+'2');
+  const line2 = gave > 0 && p.peak > p.entry ? ` Takipten bu yana değer en çok ${fmtMoney(peakVal)} ${q} olmuştu, zirveden ${fmtMoney(gave)} ${q} geri verildi.` : '';
+  const line3 = ` Uyarı seviyeniz (${fmtRaw(stopP)} ${q}) görülürse değer ${fmtMoney(stopVal)} ${q} olur, yani yaklaşık ${fmtMoney(Math.abs(stopLoss))} ${q} kayıp.`;
+  const up5 = (c.price * 1.05) * amt - cost, dn5 = (c.price * 0.95) * amt - cost;
+  const line4 = ` Senaryo: fiyat bugünkünden %5 yükselirse toplam sonuç ${sgn(up5)}${fmtMoney(Math.abs(up5))} ${q}, %5 düşerse ${sgn(dn5)}${fmtMoney(Math.abs(dn5))} ${q} olur.`;
+  return `<div class="mgrid" style="margin-top:8px">
+      <div class="mi"><span>Miktar</span><b>${fmtRaw(amt)} ${b}</b></div>
+      <div class="mi"><span>Maliyet</span><b>${fmtMoney(cost)} ${q}</b></div>
+      <div class="mi"><span>Güncel değer</span><b>${fmtMoney(val)} ${q}</b></div>
+      <div class="mi"><span>Kâr / Zarar</span><b class="${diff >= 0 ? 'g' : 'r'}">${sgn(diff)}${fmtMoney(Math.abs(diff))} ${q}</b></div>
+      <div class="mi"><span>Satılabilir değer (alış fiyatından)</span><b>${fmtMoney(bidVal)} ${q}</b></div>
+      <div class="mi"><span>Uyarı seviyesinde değer</span><b class="r">${fmtMoney(stopVal)} ${q}</b></div>
+    </div>
+    <div class="ot" style="margin-top:8px">${line1}${line2}${line3}${line4}${tryEq(val, q) ? ' Güncel değerin TL karşılığı' + tryEq(val, q).replace(/[()]/g,'') + '.' : ''}</div>`;
+}
 function renderPositions(){
-  if(!positions.length) return '<div class="muted" style="text-align:left">Henüz takipte coin yok. Fırsat listesinden veya detay penceresinden <b>📌 Takibe Al</b> diyerek ekleyin. Fiyat zarar eşiğinizin altına inerse sesli uyarı alırsınız.</div>';
+  if(!positions.length) return '<div class="muted" style="text-align:left">Henüz takipte coin yok. Fırsat listesinden veya detay penceresinden <b>📌 Takibe Al</b> diyerek ekleyin. Miktar girerseniz maliyet, güncel değer ve kâr/zarar tutarı da gösterilir. Fiyat zarar eşiğinizin altına inerse sesli uyarı alırsınız.</div>';
   return positions.map(p => {
     const c = mkt[p.s]; if(!c) return '';
+    if(!c.seedTried) seedChart(c);
+    const A = an[p.s] || analyze(c, 0.5), m = A.meta;
     const pnl = (c.price / p.entry - 1) * 100, up = pnl >= 0;
-    const stopP = p.entry * (1 - p.warn / 100);
+    const stopP = p.entry * (1 - p.warn / 100), toStop = (c.price / stopP - 1) * 100;
+    const fromPeak = (c.price / p.peak - 1) * 100;
     const status = pnl <= -p.warn ? '🚨 Zarar eşiği aşıldı' : pnl <= -p.warn * 0.6 ? '⚠️ Eşiğe yaklaşıyor' : up ? '✅ Kârda' : '🟡 Hafif zararda';
-    const note = pnl <= -p.warn * 0.6 ? posNarr(p, c, pnl, pnl <= -p.warn ? 'loss' : 'pre') : (up ? posStatus(p, c, pnl) : posStatus(p, c, pnl));
-    const amtTxt = p.amt > 0 ? ` · ${up ? '+' : ''}${fmtMoney((c.price - p.entry) * p.amt)} ${c.q}` : '';
-    return `<div class="opp"><div class="oh"><b>${c.b}/${c.q}</b><span class="badge ${p.hz === 'long' ? 'bg-y' : 'bg-n'}">${p.hz === 'long' ? 'Uzun vade' : 'Kısa vade'}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:800">${up ? '+' : ''}${fmtPct(pnl)}%${amtTxt}</span></div><div class="ot" style="color:var(--sub)">Alış ${fmtRaw(p.entry)} → şimdi ${fmtRaw(c.price)} ${c.q} · uyarı seviyesi ${fmtRaw(stopP)} (-%${fmtPct(p.warn)}) · ${status}</div><div class="ot">${note}</div><div class="oa"><button class="clrbtn" data-det="${p.s}">Detay</button><button class="clrbtn" data-del="${p.id}">✕ Takipten çıkar</button></div></div>`;
+    const note = pnl <= -p.warn * 0.6 ? posNarr(p, c, pnl, pnl <= -p.warn ? 'loss' : 'pre') : posStatus(p, c, pnl);
+    const sec = p.hz === 'long' ? A.long : A.short;
+    const outlook = sec ? `<div class="ot" style="margin-top:8px"><b>Güncel görünüm (${p.hz === 'long' ? 'uzun' : 'kısa'} vade, ${sec.score} · ${label(sec.score)}):</b> ${sec.text}</div>` : '';
+    const spread = c.ask > 0 && c.bid > 0 ? (c.ask - c.bid) / c.price * 100 : 0;
+    const box = (l, v, cl) => `<div class="mi"><span>${l}</span><b class="${cl || ''}">${v}</b></div>`;
+    return `<div class="opp"><div class="oh"><b>${c.b}/${c.q}</b><span class="badge ${p.hz === 'long' ? 'bg-y' : 'bg-n'}">${p.hz === 'long' ? 'Uzun vade' : 'Kısa vade'}</span><span class="badge ${pnl <= -p.warn ? 'rk-h' : up ? 'bg-g' : 'rk-m'}">${status}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:800;font-size:16px">${sgn(pnl)}${fmtPct(Math.abs(pnl))}%</span></div>
+      <div class="mgrid">
+        ${box('Alış fiyatı', fmtRaw(p.entry) + ' ' + c.q + tryEq(p.entry, c.q))}
+        ${box('Şimdiki fiyat', fmtRaw(c.price) + ' ' + c.q + tryEq(c.price, c.q), up ? 'g' : 'r')}
+        ${box('Uyarı seviyesi (-%' + fmtPct(p.warn) + ')', fmtRaw(stopP) + ' ' + c.q, 'r')}
+        ${box('Seviyeye uzaklık', up || toStop > 0 ? '%' + fmtPct(toStop) + ' yukarıda' : '%' + AB(toStop) + ' aşağıda', toStop > 0 ? '' : 'r')}
+        ${box('Takipten beri zirve', fmtRaw(p.peak) + ' ' + c.q)}
+        ${box('Zirveden fark', sgn(fromPeak) + fmtPct(Math.abs(fromPeak)) + '%', fromPeak < -p.warn * 0.6 ? 'r' : '')}
+        ${box('24s değişim', sgn(c.dp || 0) + fmtPct(Math.abs(c.dp || 0)) + '%', (c.dp || 0) >= 0 ? 'g' : 'r')}
+        ${box('24s aralık', fmtRaw(c.low) + ' – ' + fmtRaw(c.high))}
+        ${box('En iyi alış / satış', fmtRaw(c.bid) + ' / ' + fmtRaw(c.ask) + (spread ? ' (%' + fmtPct(spread) + ')' : ''))}
+        ${box('24s hacim', fmtVol(c.vb) + ' ' + c.b)}
+        ${box('Saatlik RSI', m.rsiH != null ? Math.round(m.rsiH) + (m.rsiH >= 70 ? ' (aşırı alım)' : m.rsiH <= 30 ? ' (aşırı satım)' : '') : '—')}
+        ${box('Takip süresi', durTxt(Date.now() - p.t))}
+      </div>
+      ${entryChart(c, p, stopP)}
+      ${amountBlock(p, c, stopP)}
+      <div class="ot" style="margin-top:8px">${note}</div>
+      ${outlook}
+      <div class="oa"><button class="clrbtn" data-det="${p.s}">Detay</button><button class="clrbtn" data-edit="${p.id}">✏️ Düzenle</button><button class="clrbtn" data-del="${p.id}">✕ Takipten çıkar</button></div></div>`;
   }).join('');
 }
 function posStatus(p, c, pnl){
@@ -1313,6 +1491,7 @@ function posStatus(p, c, pnl){
 function bindOpp(box){
   box.querySelectorAll('[data-det]').forEach(el => el.onclick = () => openDetail(el.dataset.det));
   box.querySelectorAll('[data-trk]').forEach(el => el.onclick = () => openTrackForm(el.dataset.trk, el.dataset.hz));
+  box.querySelectorAll('[data-edit]').forEach(el => el.onclick = () => { const q = positions.find(x => String(x.id) === el.dataset.edit); if(q) openTrackForm(q.s, q.hz, q.id); });
   box.querySelectorAll('[data-del]').forEach(el => el.onclick = () => { positions = positions.filter(p => String(p.id) !== el.dataset.del); savePos(); renderOpp(); });
   const mb = document.getElementById('oppMoreBtn'); if(mb) mb.onclick = () => { oppMore = !oppMore; renderOpp(); };
 }
@@ -1320,8 +1499,16 @@ function bindOpp(box){
   const t = document.getElementById('oppTab' + k);
   if(t) t.onclick = () => { oppTab = v; oppMore = false; renderOpp(); };
 });
+(function(){
+  const chk = document.getElementById('oppAlertChk');
+  if(chk){
+    chk.checked = oppAlertOn;
+    chk.onchange = () => { oppAlertOn = chk.checked; try { localStorage.setItem('btc_opp_alert', oppAlertOn ? '1' : '0'); } catch(e){} if(oppAlertOn) unlockAudio(); };
+  }
+  const rb = document.getElementById('oppRefresh'); if(rb) rb.onclick = () => { unlockAudio(); refreshNow(); };
+})();
 setInterval(scanAll, 15000);
-setInterval(() => { if(oppTab === 'pos') renderOpp(); }, 2000);
+setInterval(() => { if(oppTab === 'pos' && !document.getElementById('trackModal')) renderOpp(); }, 1500);
 histWorker();
 
 // ================= BtcTurk WebSocket (CORS'a takılmaz, TÜM çiftler) =================
@@ -1420,12 +1607,15 @@ function showHelp(){
       <p>Detay penceresindeki grafik son saatlerin dakikalık verisi ile canlı fiyatı birleştirir. Sağdaki yanıp sönen nokta anlık fiyattır. RSI (14) 70 üstünde aşırı alım, 30 altında aşırı satım eğilimi gösterir; yatırım tavsiyesi değildir.</p>
 
       <div class="mhd">🎯 Yatırım Fırsatları ve Takip</div>
-      <p>Sayfa, hacmi yüksek coinlerin son 100 günlük günlük ve son 60 saatlik saatlik mumlarını çekip RSI, ortalamalar, hacim artışı, zirveden uzaklık, oynaklık ve alış-satış farkını puanlar. <b>Kısa vade</b> saatler-günler, <b>uzun vade</b> haftalar-aylar için ayrı puan verir. Her coin için metin, o anki rakamlara göre yeniden yazılır. Puan 58 altındaysa listeye girmez.<br>
+      <p>Sayfa, hacmi yüksek coinlerin son 100 günlük günlük ve son 60 saatlik saatlik mumlarını çekip RSI, ortalamalar, hacim artışı, zirveden uzaklık, oynaklık ve alış-satış farkını puanlar. <b>Kısa vade</b> saatler-günler, <b>uzun vade</b> haftalar-aylar için ayrı puan verir. Her coin için metin, o anki rakamlara göre yeniden yazılır. Puan 58 altındaysa listeye girmez. Fiyatlar canlı akar, tarama 15 saniyede bir yenilenir; saatlik mumlar 20 dakikada, günlük mumlar 6 saatte bir tazelenir. Listeye <b>yeni</b> bir coin girerse (🆕 YENİ rozeti) uyarı gelir; ilk yükleme bittikten sonra devreye girer, aynı coin için 3 saat içinde tekrar uyarmaz. Kartın üstündeki kutuyla kapatabilirsiniz.<br>
       <b>📌 Takibe Al</b> ile aldığınız fiyatı ve zarar uyarı yüzdesini girersiniz (kısa vade için varsayılan %5, uzun vade %12). Fiyat eşiğe yaklaşınca erken uyarı, eşiğin altına inince sesli ve bildirimli uyarı gelir; zarar derinleştikçe tekrar uyarır. Kârdayken zirveden belirgin geri çekilme olursa kâr koruma uyarısı da verir. Takipler tarayıcıda saklanır, sayfanın açık olması gerekir.<br>
       <span style="color:var(--sub)">Bunlar teknik sinyallerdir; yatırım tavsiyesi veya getiri garantisi değildir.</span></p>
 
       <div class="mhd">🔔 Alarm</div>
       <p>Detayda hedef fiyat yazıp <b>Alarm Kur</b>'a basın (virgül veya nokta kullanabilirsiniz). Fiyat hedefe ulaşınca bip sesi, titreşim ve bildirim gelir; uyarıya dokununca ses durur. Alarmlar tarayıcıda saklanır. Alarmın çalışması için sayfanın açık olması gerekir.</p>
+
+      <div class="mhd">🗂️ Paneller</div>
+      <p>Yatırım fırsatlarının altındaki dört düğme (%3+ Değişenler, Canlı Sıralama, Değişim Uyarıları, Teknik Sinyaller) ilgili paneli açar; aynı düğmeye veya ✕ Kapat'a basınca kapanır. Sayılar o paneldeki güncel kayıt sayısıdır.</p>
 
       <div class="mhd">🟣 %3+ Değişenler</div>
       <p>Son 24 saatte günlük değişimi %${BIG_MOVE} veya üzeri olan coinleri, ayrıca alış/satışında anlık %${BIG_MOVE}+ hareket yakalanan coinleri (⚡ saat ile) listeler. <b>Listele</b> düğmesine basın, satıra dokununca detay açılır. Anlık hareket kaydı bu sayfa açıkken yakalanır ve 24 saat saklanır.</p>
@@ -1444,6 +1634,26 @@ document.getElementById('helpBtn').onclick = showHelp;
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeHelp(); });
 
 document.getElementById('bgBtn').onclick = () => { bigOpen = !bigOpen; bigPage = 0; renderBig(); };
+
+// ---- Bilgi merkezi: butonla aç / kapat ----
+let infoOpen = null;
+function updateInfoCounts(){
+  [['ibBig','bgCnt'],['ibLog','alCnt'],['ibSig','sgCnt']].forEach(([a,b]) => {
+    const x = document.getElementById(a), y = document.getElementById(b);
+    if(x && y) x.textContent = y.textContent;
+  });
+}
+function setInfo(p){
+  infoOpen = (infoOpen === p) ? null : p;
+  document.querySelectorAll('.ibtn').forEach(b => b.classList.toggle('on', b.dataset.p === infoOpen));
+  document.querySelectorAll('.infopanel').forEach(c => { c.style.display = c.dataset.panel === infoOpen ? 'block' : 'none'; });
+  if(infoOpen){
+    const el = document.querySelector('.infopanel[data-panel="' + infoOpen + '"]');
+    if(el && el.scrollIntoView) el.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }
+}
+document.querySelectorAll('.ibtn').forEach(b => b.onclick = () => setInfo(b.dataset.p));
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => setInfo(infoOpen));
 
 // Sekmeler (Tümü / TRY / USDT / Favoriler)
 ['All','TRY','USDT','Fav'].forEach(n=>{
