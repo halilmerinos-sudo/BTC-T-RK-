@@ -2,1206 +2,756 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>KRİPTO TAKİP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0e11">
+<title>BTC TÜRK KRİPTO CANLI</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',-apple-system,sans-serif;touch-action:manipulation;}
-body{background:#0f172a;color:white;min-height:100vh;padding:12px;-webkit-user-select:none;user-select:none;}
-.wrap{width:100%;max-width:420px;margin:0 auto;}
-.card{background:#1e293b;border-radius:20px;padding:16px;border:1px solid #334155;margin-bottom:12px;}
-.hdr{text-align:center;margin-bottom:12px;}
-.hdr h1{color:#38ef7d;font-size:1.5rem;letter-spacing:1px;}
-.hdr .src{color:#38ef7d;font-size:0.72rem;font-weight:bold;display:block;margin-top:2px;}
-.hdr p{color:#94a3b8;font-size:0.78rem;margin-top:3px;}
-.sbox{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:10px 14px;font-size:0.78rem;}
-.sr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.sr:last-child{margin-bottom:0;padding-top:4px;border-top:1px dashed #334155;}
-.clk{color:#fbbf24;font-weight:bold;}
-.s-on{color:#22c55e;font-weight:bold;}
-.s-off{color:#ff4757;font-weight:bold;}
-.s-try{color:#fbbf24;font-weight:bold;}
-.ibtn{width:100%;padding:10px;background:#1e293b;color:#cbd5e1;border:1px solid #475569;border-radius:10px;font-weight:bold;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;}
-.pnl-card{background:#0f172a;border:1px solid #38ef7d33;border-radius:14px;padding:12px;margin-bottom:12px;}
-.pnl-title{font-size:0.8rem;color:#38ef7d;font-weight:bold;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #334155;}
-.pnl-sel{width:100%;padding:8px;background:#1e293b;border:1px solid #475569;border-radius:8px;color:white;font-size:0.88rem;outline:none;margin-bottom:6px;cursor:pointer;}
-.pnl-row{display:flex;gap:6px;margin-bottom:6px;}
-.pnl-f{flex:1;}
-.pnl-f label{display:block;font-size:0.65rem;color:#94a3b8;font-weight:bold;margin-bottom:2px;}
-.pnl-f input{width:100%;padding:7px;background:#1e293b;border:1px solid #475569;border-radius:7px;color:white;font-size:0.88rem;text-align:center;outline:none;}
-.pnl-f input:focus{border-color:#38ef7d;font-size:16px !important;}
-.pnl-res{display:flex;justify-content:space-between;align-items:center;background:#1e293b;border-radius:99px;padding:9px 14px;}
-.pnl-lbl{font-size:0.72rem;color:#94a3b8;}
-.pnl-cur{font-size:0.82rem;color:#e2e8f0;font-weight:bold;margin-top:1px;}
-.pnl-val{font-size:0.95rem;font-weight:bold;text-align:right;}
-.pnl-pct{font-size:0.72rem;text-align:right;margin-top:1px;}
-.top5-card{background:#0f172a;border:1px solid #334155;border-radius:14px;padding:12px;margin-bottom:12px;}
-.sec-title{font-size:0.8rem;font-weight:bold;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #334155;}
-.t5-tabs{display:flex;gap:6px;margin-bottom:8px;}
-.t5btn{flex:1;padding:5px;text-align:center;border-radius:7px;border:1px solid #475569;background:#1e293b;color:#94a3b8;font-size:0.72rem;font-weight:bold;cursor:pointer;}
-.t5btn.up{background:#052e16;border-color:#22c55e;color:#22c55e;}
-.t5btn.dn{background:#2d0a0a;border-color:#ff4757;color:#ff4757;}
-.t5row{display:flex;align-items:center;padding:5px 7px;border-radius:8px;background:#1e293b;margin-bottom:3px;cursor:pointer;}
-.t5rk{font-size:0.68rem;color:#475569;width:16px;flex-shrink:0;}
-.t5nm{font-size:0.82rem;font-weight:bold;flex:1;}
-.t5pr{font-size:0.72rem;color:#94a3b8;margin-right:8px;font-family: monospace;}
-.t5ch{font-size:0.82rem;font-weight:bold;font-family: monospace;}
-.fcard{background:#0f172a;padding:10px;border-radius:12px;border:1px solid #334155;margin-bottom:10px;}
-.cbrow{display:flex;align-items:center;margin-bottom:7px;cursor:pointer;}
-.cbrow input[type=checkbox]{width:16px;height:16px;margin-right:7px;accent-color:#38ef7d;flex-shrink:0;}
-.cbrow label{font-size:0.8rem;color:#cbd5e1;cursor:pointer;}
-.bbts{display:flex;gap:5px;margin-top:8px;padding-top:8px;border-top:1px dashed #334155;}
-.bbtn{flex:1;padding:6px;font-size:0.7rem;font-weight:bold;background:#1e293b;border:1px solid #475569;color:#cbd5e1;border-radius:6px;cursor:pointer;}
-.sg{margin-bottom:10px;}
-.sg label{display:block;margin-bottom:5px;color:#cbd5e1;font-size:0.78rem;font-weight:bold;}
-.sg input{width:100%;padding:10px;outline:none;border-radius:99px;background:#0f172a;color:white;font-size:1rem;text-align:center;border:1px solid #475569;}
-.sg input:focus{font-size:16px !important;}
-.srch input{width:100%;padding:10px;outline:none;border-radius:9px;background:#0f172a;color:white;font-size:0.95rem;border:1px solid #475569;margin-bottom:10px;}
-.thead{display:flex;justify-content:space-between;background:#334155;padding:8px 10px;border-radius:99px;margin-bottom:8px;font-size:0.72rem;font-weight:bold;}
-.clist{max-height:400px;overflow-y:auto;transition: max-height 0.2s ease;}
-.crow{background:#0f172a;border-left:4px solid #475569;border-radius:11px;padding:10px;margin-bottom:8px;cursor:pointer;display:flex;flex-direction:column;transition: background-color 0.4s ease, border-left-color 0.4s ease;}
-.crow-top{display:flex;align-items:flex-start;width:100%;}
-.cchk{width:22px;flex-shrink:0;padding-top:2px;}
-.cchk input{width:15px;height:15px;accent-color:#38ef7d;}
-.cbody{flex:1;}
-.ctop{display:flex;justify-content:space-between;margin-bottom:3px;}
-.cname{font-size:0.95rem;font-weight:bold;}
-.cmid{font-size:0.68rem;color:#38ef7d;margin-top:1px;}
-.cright{text-align:right;}
-.cchg{font-weight:bold;font-size:0.88rem;font-family: monospace;}
-.cprice{font-size:0.78rem;color:#e2e8f0;font-weight:600;margin-top:1px;font-family: monospace;}
-.badge{display:inline-block;font-size:0.62rem;font-weight:bold;padding:1px 4px;border-radius:3px;margin-left:3px;}
-.bd-fast{background:#7c3aed33;color:#a78bfa;}
-.bd-rsi-ob{background:#7f1d1d44;color:#fca5a5;}
-.bd-sl{background:#ff475722;color:#ff4757;}
-.bd-ma{background:#fbbf2422;color:#fbbf24;}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.9);justify-content:center;align-items:flex-start;z-index:9999;padding:16px;overflow-y:auto;}
-.mcard{background:#1e293b;border:1px solid #475569;border-radius:18px;width:100%;max-width:370px;padding:18px;margin:auto;}
-.mtitle{font-size:1.1rem;color:#38ef7d;font-weight:bold;text-align:center;margin-bottom:12px;border-bottom:1px solid #334155;padding-bottom:8px;}
-.mhdr{font-size:0.8rem;color:#fbbf24;font-weight:bold;margin-top:10px;margin-bottom:6px;border-left:3px solid #fbbf24;padding-left:5px;}
-.mrow{display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px;padding-bottom:4px;border-bottom:1px dashed #1e3a5f;}
-.mlbl{color:#94a3b8;}
-.mval{font-weight:bold;color:#f8fafc;text-align:right;font-family: monospace;}
-.mcbtn{width:100%;padding:11px;color:white;border:none;border-radius:99px;font-weight:bold;margin-top:12px;cursor:pointer;font-size:0.9rem;}
-.aibox{background:#0f172a;border:1px solid #fbbf24;padding:12px;border-radius:12px;margin-top:8px;font-size:0.78rem;color:#f8fafc;line-height:1.6;border-left:4px solid #38ef7d;}
-.pal {display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:7px;padding:5px 8px;margin-top:4px;}
-.pal input{flex:1;background:#1e293b;border:1px solid #38ef7d;color:white;border-radius:5px;padding:5px;font-size:0.88rem;text-align:center;outline:none;}
-.pal input:focus{font-size:16px !important;}
-.palbtn{background:#38ef7d;color:#0f172a;border:none;border-radius:5px;padding:5px 7px;font-size:0.72rem;font-weight:bold;cursor:pointer;}
-.sl-input{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #ff475744;border-radius:7px;padding:5px 8px;margin-top:4px;}
-.sl-input input{flex:1;background:#1e293b;border:1px solid #ff4757;color:white;border-radius:5px;padding:5px;font-size:0.88rem;text-align:center;outline:none;}
-.sl-input input:focus{font-size:16px !important;}
-.no-coin{text-align:center;padding:20px;color:#94a3b8;font-size:0.82rem;}
-.info-box {font-size:0.78rem;color:#cbd5e1;line-height:1.6;}
-.info-box b{color:#fbbf24;}
-.sig-panel{background:#0f172a;border:1px solid #334155;border-radius:14px;padding:12px;margin-bottom:12px;}
-.sig-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #334155;}
-.sig-title{font-size:0.8rem;font-weight:bold;color:#a78bfa;}
-.sig-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;}
-.sig-toggle input{width:15px;height:15px;accent-color:#a78bfa;}
-.sig-toggle label{font-size:0.72rem;color:#a78bfa;cursor:pointer;font-weight:bold;}
-.sig-count{background:#7c3aed44;color:#a78bfa;font-size:0.65rem;font-weight:bold;padding:1px 6px;border-radius:10px;margin-left:4px;}
-.sig-list{max-height:220px;overflow-y:auto;display:none;}
-.sig-list.open{display:block;}
-.sig-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:8px;background:#1e293b;margin-bottom:3px;cursor:pointer;}
-.sig-nm{font-size:0.82rem;font-weight:bold;color:#e2e8f0;}
-.sig-type{font-size:0.7rem;font-weight:bold;padding:1px 5px;border-radius:4px;}
-.sig-rsi-ob{background:#7f1d1d44;color:#fca5a5;}
-.sig-rsi-os{background:#052e1644;color:#86efac;}
-.sig-time{font-size:0.65rem;color:#475569;}
-.sig-clear{background:none;border:1px solid #475569;color:#94a3b8;border-radius:5px;padding:2px 7px;font-size:0.68rem;cursor:pointer;margin-left:6px;}
-.proxy-bar{font-size:0.65rem;color:#475569;text-align:right;margin-top:2px;}
-.toast-container { position: fixed; top: 16px; right: 16px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; max-width: 280px; width: 100%; }
-.toast-box { background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 10px 14px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); display: flex; flex-direction: column; animation: toastSlide 0.3s ease-out forwards; cursor: pointer; }
-.toast-box.up { border-left: 5px solid #22c55e; background: #062f17; }
-.toast-box.down { border-left: 5px solid #ff4757; background: #2d0d10; }
-.toast-hdr { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.82rem; margin-bottom: 4px; }
-.toast-coin { color: #ffffff; }
-.toast-pct { font-family: monospace; }
-.toast-body { font-size: 0.72rem; color: #cbd5e1; font-family: monospace; }
-@keyframes toastSlide { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes toastFade { to { transform: translateX(50%); opacity: 0; } }
+:root{--bg:#0b0e11;--panel:#161a1e;--panel2:#1e2329;--line:#2b3139;--txt:#eaecef;--sub:#848e9c;--green:#0ecb81;--red:#f6465d;--accent:#2f6fed;--yellow:#f0b90b;--purple:#a78bfa}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:var(--bg);color:var(--txt);font-size:14px}
+.topbar{display:flex;align-items:center;gap:18px;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;letter-spacing:.5px}
+.logo .b{color:var(--yellow)}.logo .t{color:#fff}
+.nav{display:flex;gap:16px;flex:1;flex-wrap:wrap}
+.nav a{color:var(--sub);text-decoration:none;font-weight:600;padding:6px 4px;cursor:pointer}
+.nav a.active,.nav a:hover{color:var(--txt)}
+.clock{color:var(--sub);font-variant-numeric:tabular-nums;font-size:13px}
+.btn{background:var(--yellow);color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
 
-.anbtn { width: 100%; padding: 12px; background: linear-gradient(135deg, #7c3aed, #9333ea); color: white; border: none; border-radius: 14px; font-weight: bold; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); transition: all 0.2s; }
-.anbtn:active { transform: scale(0.98); }
-.an-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-.an-tab-btn { flex: 1; padding: 8px; text-align: center; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #94a3b8; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
-.an-tab-btn.active { background: #1e293b; color: white; border-color: #fbbf24; }
-.an-list { max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-.an-card { background: #0f172a; border-radius: 10px; padding: 10px; border: 1px solid #334155; cursor: pointer; }
-.an-row-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.an-coin-name { font-weight: bold; font-size: 0.9rem; color: #e2e8f0; }
-.an-coin-price { font-family: monospace; font-size: 0.8rem; font-weight: 600; }
-.an-badge-line { display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap; }
-.an-badge { font-size: 0.62rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
-.an-badge.dip { background: #052e16; color: #4ade80; }
-.an-badge.zirve { background: #450a0a; color: #f87171; }
-.an-badge.ind { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; }
-.an-verdict { font-size: 0.75rem; padding: 6px 10px; border-radius: 6px; line-height: 1.4; font-weight: 500; }
-.an-verdict.true { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px dashed #22c55e; }
-.an-verdict.fake { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px dashed #ef4444; }
-
-.delta-panel{background:#0f172a;border:1px solid #38ef7d44;border-radius:14px;padding:12px;margin-bottom:12px;}
-.delta-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #334155;}
-.delta-title{font-size:0.8rem;font-weight:bold;color:#38ef7d;}
-.delta-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;}
-.delta-toggle input{width:15px;height:15px;accent-color:#38ef7d;}
-.delta-toggle label{font-size:0.72rem;color:#38ef7d;cursor:pointer;font-weight:bold;}
-.delta-count{background:#22c55e33;color:#38ef7d;font-size:0.65rem;font-weight:bold;padding:1px 6px;border-radius:10px;margin-left:4px;}
-.delta-list{max-height:220px;overflow-y:auto;display:none;}
-.delta-list.open{display:block;}
-.delta-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:8px;background:#1e293b;margin-bottom:3px;cursor:pointer;}
-.delta-nm{font-size:0.82rem;font-weight:bold;color:#e2e8f0;}
-.delta-val{font-size:0.72rem;font-family:monospace;font-weight:bold;}
-.delta-time{font-size:0.65rem;color:#475569;}
-.delta-clear{background:none;border:1px solid #475569;color:#94a3b8;border-radius:5px;padding:2px 7px;font-size:0.68rem;cursor:pointer;margin-left:6px;}
-
-.ai-predict-btn { width: 100%; padding: 11px; background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
-.ai-predict-btn:active { transform: scale(0.98); }
-.ai-window { background: #0f172a; border: 1px dashed #10b981; border-radius: 12px; padding: 12px; margin-top: 12px; }
-.ai-win-title { font-size: 0.78rem; color: #10b981; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px dashed #334155; padding-bottom: 6px; margin-bottom: 8px; }
-.ai-win-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-.ai-m-box { background: #1e293b; border-radius: 6px; padding: 6px; font-size: 0.7rem; }
-.ai-m-lbl { color: #94a3b8; margin-bottom: 2px; }
-.ai-m-val { font-weight: bold; font-family: monospace; }
-.ai-report-text { font-size: 0.75rem; line-height: 1.5; color: #e2e8f0; background: #13241d; padding: 10px; border-radius: 8px; border-left: 3px solid #10b981; }
-
-.resize-bar { width: 100%; height: 14px; background: #334155; border-radius: 99px; margin-bottom: 10px; cursor: ns-resize; display: flex; align-items: center; justify-content: center; position: relative; }
-.resize-bar::before { content: ""; width: 40px; height: 4px; background: #94a3b8; border-radius: 2px; }
-
-/* BELİRGİNLEŞTİRİLMİŞ PARLAK ANLIK RENK DEĞİŞİMLERİ */
-.flash-green { 
-    background-color: #052e16 !important; 
-    border-left-color: #22c55e !important;
-    box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.6);
+.stale-banner {
+  background: var(--red);
+  color: #fff;
+  text-align: center;
+  padding: 10px 16px;
+  font-weight: 800;
+  display: none;
+  position: sticky;
+  top: 57px;
+  z-index: 49;
+  box-shadow: 0 4px 15px rgba(246, 70, 93, 0.4);
+  font-size: 14px;
 }
-.flash-red { 
-    background-color: #450a0a !important; 
-    border-left-color: #ef4444 !important;
-    box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.6);
+
+.wrap{max-width:1200px;margin:18px auto;padding:0 16px}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-bottom:18px}
+.card{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.ctitle{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;color:var(--txt)}
+.ctitle .cnt{margin-left:auto;background:var(--panel2);color:var(--sub);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700}
+label.fl{display:block;font-size:11px;color:var(--sub);font-weight:600;margin-bottom:4px}
+input,select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:9px 11px;border-radius:7px;font-size:13px;outline:none;width:100%}
+input:focus,select:focus{border-color:var(--accent)}
+.row2{display:flex;gap:8px}.row2>div{flex:1;min-width:0}
+.pnlout{margin-top:12px;background:var(--panel2);border-radius:8px;padding:11px 13px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:8px 14px}
+.pnlout>div{min-width:0;max-width:100%}
+.pnlout>div:last-child{margin-left:auto;text-align:right}
+.pnlout .sub2{font-size:11px;color:var(--sub);margin-top:3px;overflow-wrap:anywhere}
+.pnlout .lbl{font-size:11px;color:var(--sub)}
+.pnlout .cur{font-size:13px;font-weight:700;overflow-wrap:anywhere}
+.pnlout .val{font-size:clamp(14px,4.6vw,17px);font-weight:800;text-align:right;overflow-wrap:anywhere}
+.pnlout .pct{font-size:12px;text-align:right}
+.g{color:var(--green)}.r{color:var(--red)}.y{color:var(--yellow)}
+.tabs2{display:flex;gap:6px;margin-bottom:10px}
+.tb2{flex:1;text-align:center;padding:7px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--sub);font-size:12px;font-weight:700;cursor:pointer}
+.tb2.up{background:rgba(14,203,129,.12);border-color:var(--green);color:var(--green)}
+.tb2.dn{background:rgba(246,70,93,.12);border-color:var(--red);color:var(--red)}
+.rkrow,.lgrow,.sgrow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;background:var(--panel2);margin-bottom:5px;cursor:pointer;font-size:13px}
+.rkrow .rk{color:var(--sub);width:16px;font-size:11px}
+.rkrow .nm,.sgrow .nm{font-weight:700;flex:1}
+.rkrow .pr{color:var(--sub);font-size:12px;font-variant-numeric:tabular-nums}
+.rkrow .ch{font-weight:700;font-variant-numeric:tabular-nums}
+.scroll{max-height:220px;overflow-y:auto}
+.muted{text-align:center;color:var(--sub);font-size:12px;padding:16px}
+.tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.tag.ob{background:rgba(246,70,93,.18);color:#fca5a5}
+.tag.os{background:rgba(14,203,129,.18);color:#86efac}
+.lgrow .tm{color:var(--sub);font-size:11px}
+.clrbtn{background:none;border:1px solid var(--line);color:var(--sub);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer}
+.bar{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.qbox{position:relative;flex:1;min-width:240px}
+#q{width:100%;padding-right:34px}
+.qx{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--panel);color:var(--sub);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+.qx.show{display:flex}
+.qx:hover{color:var(--txt);background:var(--line)}
+.tabs{display:flex;gap:8px}
+.tab{padding:9px 14px;border-radius:8px;background:var(--panel2);color:var(--sub);cursor:pointer;font-weight:600;width:auto}
+.tab.on{background:var(--yellow);color:#000}
+table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:12px;overflow:hidden}
+thead th{text-align:left;color:var(--sub);font-weight:600;font-size:12px;padding:14px 12px;border-bottom:1px solid var(--line)}
+tbody td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+
+/* TÜM SATIRIN ANLIK YANIP SÖNME ANİMASYONU */
+tbody tr.crow {
+  transition: background-color 1s ease-out;
 }
+@keyframes rowFlashGreen {
+  0% { background-color: rgba(14, 203, 129, 0.45) !important; }
+  100% { background-color: transparent; }
+}
+@keyframes rowFlashRed {
+  0% { background-color: rgba(246, 70, 93, 0.45) !important; }
+  100% { background-color: transparent; }
+}
+tbody tr.flash-g { animation: rowFlashGreen 0.9s ease-out; }
+tbody tr.flash-r { animation: rowFlashRed 0.9s ease-out; }
+
+tbody tr:hover{background:var(--panel2)}
+
+.star{color:#3a414a;cursor:pointer;font-size:16px;width:28px}
+.star.on{color:var(--yellow)}
+.pair{display:flex;align-items:center;gap:7px;cursor:pointer}
+.ico{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--yellow));display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff}
+.pair b{font-weight:700}.pair .sub{color:var(--sub);font-size:12px}.pair .nm{color:var(--sub);font-size:12px;margin-left:4px}
+.price{font-variant-numeric:tabular-nums;font-weight:600}
+.chg{font-weight:700;font-variant-numeric:tabular-nums}
+.vol{color:var(--sub);font-variant-numeric:tabular-nums}
+.tbtn{border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-right:6px}
+.tbtn.g{background:rgba(14,203,129,.15);color:var(--green)}
+.tbtn.r{background:rgba(246,70,93,.15);color:var(--red)}
+.tbtn.big2{flex:1;padding:13px;font-size:15px;margin:0}
+.empty{text-align:center;color:var(--sub);padding:40px}
+
+@media(max-width:700px){
+  body{font-size:15px;padding-bottom:env(safe-area-inset-bottom)}
+  .topbar{gap:10px;padding:10px 12px 10px calc(12px + env(safe-area-inset-left))}
+  .logo{font-size:17px}
+  .nav{order:3;flex:1 0 100%;gap:12px;margin-top:4px}
+  .btn{padding:7px 12px;font-size:13px}
+  .wrap{margin:12px auto;padding:0 10px}
+  .panels{grid-template-columns:1fr;gap:12px}
+  .vol{display:none}
+  .sp svg{width:56px;height:24px}
+  .pair .nm{display:none}
+  .pair .sub{display:none}
+  thead th{padding:10px 8px;font-size:11px}
+  tbody td{padding:11px 8px}
+  .star{width:22px;font-size:18px}
+  .ico{width:30px;height:30px;font-size:13px}
+  .pair b{font-size:15px}
+  .price{font-size:14px}
+  .chg{font-size:14px}
+  .tbtn{padding:8px 12px;font-size:14px}
+  #q{min-width:0}
+  .tab{padding:10px 14px}
+  .mcard{max-width:100%;padding:16px;border-radius:16px}
+  .mprice .big{font-size:24px}
+  input,select{padding:11px 12px;font-size:16px}
+  .toast-wrap{left:10px;right:10px;max-width:none;top:calc(10px + env(safe-area-inset-top))}
+}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;z-index:100;padding:16px;overflow-y:auto}
+.mcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:100%;max-width:460px;padding:20px;margin:auto;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mtit{display:flex;align-items:center;gap:10px}.mtit .ico{width:34px;height:34px;font-size:15px}.mtit b{font-size:17px}.mtit .nm{color:var(--sub);font-size:12px}
+.close{cursor:pointer;color:var(--sub);font-size:18px;padding:4px 8px;border-radius:6px}.close:hover{background:var(--panel2);color:var(--txt)}
+.mprice{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.mprice .big{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}.mprice .big span{font-size:13px;color:var(--sub)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mi{background:var(--panel2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.mi span{color:var(--sub);font-size:11px}.mi b{font-size:14px;font-variant-numeric:tabular-nums;transition:background-color .15s,color .15s;border-radius:4px;padding:0 2px}
+.mchart{background:var(--panel2);border-radius:10px;padding:10px 8px 6px;margin-bottom:14px}
+.mchart .ct{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--sub);margin:0 4px 6px}
+.mchart svg{display:block;width:100%;height:120px}
+.cwrap{position:relative}
+.pdot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--dotc,var(--green));animation:pulse 1.4s infinite;transition:top .4s linear}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}100%{box-shadow:0 0 0 10px rgba(255,255,255,0)}}
+.mchart .lv{font-variant-numeric:tabular-nums;font-weight:700}
+.mhd{font-size:12px;font-weight:700;margin:4px 0 8px;padding-left:7px;border-left:3px solid var(--yellow);color:var(--yellow)}
+.alarmbox{display:flex;gap:7px;margin-bottom:12px}
+.alarmbox input{flex:1}
+.alarmbox button{background:var(--yellow);color:#000;border:none;border-radius:7px;padding:0 14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.mbtns{display:flex;gap:10px;margin-top:4px}
+.toast-wrap{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:300px;width:100%}
+.toast{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;box-shadow:0 10px 20px rgba(0,0,0,.4);animation:tin .3s ease;cursor:pointer}
+.toast.up{border-left:4px solid var(--green)}.toast.down{border-left:4px solid var(--red)}.toast.alarm{border-left:4px solid var(--yellow)}
+.toast .th{display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:3px}
+.toast .tbd{font-size:12px;color:var(--sub)}
+@keyframes tin{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
 </style>
 </head>
 <body>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="topbar">
+  <div class="logo"><span class="b">BTC</span><span class="t">TÜRK</span></div>
+  <div class="nav"><a class="active">Piyasalar</a></div>
+  <span id="conn" style="font-size:12px;font-weight:700;color:var(--yellow)">● BAĞLANIYOR...</span>
+  <div class="clock" id="clock">--:--:--</div>
+  <button class="btn ghost">Giriş Yap</button>
+  <button class="btn">Kayıt Ol</button>
+</div>
 
-<div class="toast-container" id="toastContainer"></div>
+<div id="staleBanner" class="stale-banner">⚠️ CANLI VERİ AKIŞI DURDU / YENİLENMİYOR! İNTERNET BAĞLANTINIZI KONTROL EDİN.</div>
 
 <div class="wrap">
-<div class="card">
-<div class="hdr">
-<h1>🚀 KRİPTO TAKİP</h1>
-<span class="src">KAYNAK: HALİL KILIÇ</span>
-<p>TRY coinleri canlı teknik takip paneli</p>
-</div>
-<div class="sbox" style="margin-bottom:12px;">
-<div class="sr">
-<span>Saat: <span id="liveClock" class="clk">00:00:00</span></span>
-<span id="connSt" class="s-try">● BAĞLANILIYOR...</span>
-</div>
-<div class="sr">
-<span style="color:#94a3b8;">Güncelleme:</span>
-<span id="lastUpd" style="color:#e2e8f0;">Bekliyor...</span>
-</div>
-<div class="proxy-bar" id="proxyBar">Kaynak: —</div>
-</div>
-<button class="ibtn" onclick="openInfo()">⚙️ SİSTEM NASIL ÇALIŞIR?</button>
-</div>
-
-<div class="delta-panel">
-<div class="delta-header">
-<div><span class="delta-title">⚡ %1.0 DEĞİŞİM UYARILARI</span><span class="delta-count" id="deltaCount">0</span></div>
-<div style="display:flex;align-items:center;gap:8px;">
-<button class="delta-clear" onclick="clearDeltaLogs()">Temizle</button>
-<div class="delta-toggle">
-<input type="checkbox" id="chkDeltaOpen" onchange="toggleDeltaList()">
-<label for="chkDeltaOpen">Listeyi Aç</label>
-</div>
-</div>
-</div>
-<div class="delta-list" id="deltaList">
-<div style="text-align:center;color:#475569;font-size:0.78rem;padding:10px;">Anlık değişimler burada arşivlenir...</div>
-</div>
-</div>
-
-<button class="anbtn" onclick="openAnalysisModal()">📊 GELİŞMİŞ DİP / ZİRVE ANALİZİ</button>
-
-<div class="pnl-card">
-<div class="pnl-title">💰 KÂR / ZARAR HESAPLA</div>
-<select class="pnl-sel" id="pnlCoin" onchange="calcPnl()"><option value="">— Coin seç —</option></select>
-<div class="pnl-row">
-<div class="pnl-f"><label>MİKTAR (adet)</label><input type="number" id="pnlAmt" placeholder="0" oninput="calcPnl()"></div>
-<div class="pnl-f"><label>ALIŞ FİYATI</label><input type="number" id="pnlBuy" placeholder="0.00" oninput="calcPnl()"></div>
-</div>
-<div class="pnl-res">
-<div><div class="pnl-lbl">Anlık Fiyat</div><div class="pnl-cur" id="pnlCur">—</div></div>
-<div><div class="pnl-val" id="pnlVal" style="color:#fbbf24;">Coin seçiniz</div><div class="pnl-pct" id="pnlPct"></div></div>
-</div>
-</div>
-
-<div class="sig-panel">
-<div class="sig-header">
-<div><span class="sig-title">📡 TEKNİK SİNYALLER</span><span class="sig-count" id="sigCount">0</span></div>
-<div style="display:flex;align-items:center;gap:8px;">
-<button class="sig-clear" onclick="clearSignals()">Temizle</button>
-<div class="sig-toggle">
-<input type="checkbox" id="chkSigOpen" onchange="toggleSigList()">
-<label for="chkSigOpen">Listeyi Aç</label>
-</div>
-</div>
-</div>
-<div class="sig-list" id="sigList">
-<div style="text-align:center;color:#475569;font-size:0.78rem;padding:10px;">Veri toplanıyor...</div>
-</div>
-</div>
-
-<div class="top5-card">
-<div class="sec-title" style="color:#fbbf24;">🏆 CANLI SIRALAMALAR <span style="font-size:0.65rem;color:#94a3b8;font-weight:normal;">— tıkla detay aç</span></div>
-<div class="t5-tabs">
-<div class="t5btn up" id="t5Up" onclick="setTop('up')">▲ En Çok Yükselen</div>
-<div class="t5btn" id="t5Dn" onclick="setTop('dn')">▼ En Çok Düşen</div>
-</div>
-<div id="top5Box"></div>
-</div>
-
-<div class="card">
-<div class="sg"><label>📊 Genel Minimum Artış (%)</label><input type="number" id="globalTarget" placeholder="Oran girince çalışır..." step="0.5" oninput="handleInput()"></div>
-<div class="fcard">
-<div class="cbrow"><input type="checkbox" id="chkOnlyTarget" onchange="savePrefs();doRender()"><label for="chkOnlyTarget">Sadece Hedefe Ulaşanları Göster</label></div>
-<div class="cbrow"><input type="checkbox" id="chkOnlySel" onchange="savePrefs();doRender()"><label for="chkOnlySel" style="color:#fbbf24;font-weight:bold;">🎯 Sadece Seçtiğim Coinleri İzle</label></div>
-<div class="bbts">
-<button class="bbtn" onclick="bulkSel(true)">✅ Tümünü Seç</button>
-<button class="bbtn" onclick="bulkSel(false)">🔲 Temizle</button>
-<button class="bbtn" style="background:#7f1d1d;color:#fca5a5;border-color:#ff4757;" onclick="resetAll()">❌ Sıfırla</button>
-</div>
-</div>
-<div class="srch"><input type="text" id="searchInput" placeholder="🔍 Coin Ara..." oninput="filterList()"></div>
-<div class="thead"><span>COİN / ANALİZ</span><span>FİYAT / DEĞİŞİM</span></div>
-
-<div class="resize-bar" id="resizeBar"></div>
-<div class="clist" id="coinList"><div class="no-coin" style="color:#38ef7d;">Bağlanılıyor...</div></div>
-</div>
-</div>
-
-<div class="modal" id="analysisModal">
-<div class="mcard" style="max-width:390px;">
-<div class="mtitle" style="color:#a78bfa; border-bottom:1px solid #475569;">🔬 AKILLI ALGORİTMA TAKİBİ</div>
-<div class="fcard" style="margin-bottom: 12px; background: #0f172a; border-color: #7c3aed44;">
-    <div class="cbrow" style="margin-bottom:0;">
-        <input type="checkbox" id="chkAnalysisOnlySel" onchange="renderAnalysisContent()">
-        <label for="chkAnalysisOnlySel" style="color:#fbbf24; font-weight:bold; font-size:0.78rem;">🎯 Sadece Seçtiğim Coinleri Göster</label>
+  <div class="panels">
+    <div class="card">
+      <div class="ctitle">💰 Kâr / Zarar Hesapla</div>
+      <label class="fl">Coin Seç</label>
+      <select id="pnlCoin"><option value="">— Coin seç —</option></select>
+      <div class="row2" style="margin-top:8px">
+        <div><label class="fl">Miktar (adet)</label><input type="number" id="pnlAmt" placeholder="0"></div>
+        <div><label class="fl">Alış Fiyatı</label><input type="number" id="pnlBuy" placeholder="0.00"></div>
+      </div>
+      <div class="pnlout">
+        <div><div class="lbl">Anlık Fiyat</div><div class="cur" id="pnlCur">—</div></div>
+        <div><div class="val y" id="pnlVal">Coin seçiniz</div><div class="pct" id="pnlPct"></div><div class="sub2" id="pnlSub"></div></div>
+      </div>
     </div>
-</div>
-<div class="an-tabs">
-<button class="an-tab-btn active" id="tabDip" onclick="switchAnalysisTab('dip')">🟢 En Dipte / Tepki Bekleyen</button>
-<button class="an-tab-btn" id="tabZirve" onclick="switchAnalysisTab('zirve')">🔴 En Zirvede / Dönüş Bekleyen</button>
-</div>
-<div class="an-list" id="analysisList">
-<div style="text-align:center;color:#94a3b8;font-size:0.8rem;padding:20px;">Hesaplanıyor...</div>
-</div>
-<button class="mcbtn" style="background:#7c3aed;" onclick="closeAnalysisModal()">✕ Pencereyi Kapat</button>
-</div>
-</div>
-
-<div class="modal" id="detailModal">
-<div class="mcard">
-<div class="mtitle" id="dtTitle">—</div>
-<div class="mhdr" style="color:#38ef7d;border-left-color:#38ef7d;">📈 FİYAT BİLGİSİ</div>
-<div class="mrow"><span class="mlbl">Son Fiyat</span><span class="mval" id="dtLast">—</span></div>
-<div class="mrow"><span class="mlbl">En İyi Alış</span><span class="mval" id="dtBid">—</span></div>
-<div class="mrow"><span class="mlbl">En İyi Satış</span><span class="mval" id="dtAsk">—</span></div>
-<div class="mrow"><span class="mlbl">Günlük Yüksek</span><span class="mval" id="dtHigh">—</span></div>
-<div class="mrow"><span class="mlbl">Günlük Düşük</span><span class="mval" id="dtLow">—</span></div>
-<div class="mrow"><span class="mlbl">💧 Spread</span><span class="mval" id="dtSpread" style="color:#fbbf24;">—</span></div>
-<div style="margin:6px 0 4px;"><canvas id="dtSpark" width="310" height="44" style="display:block;border-radius:6px;background:#0f172a;"></canvas></div>
-<div class="mhdr" style="color:#ff4757;border-left-color:#ff4757;">🚨 EMİR DEFTERİ</div>
-<div class="mrow"><span class="mlbl" style="color:#ff4757;">Bekleyen Satış</span><span class="mval" id="dtBAsk">—</span></div>
-<div class="mrow"><span class="mlbl" style="color:#22c55e;">Bekleyen Alış</span><span class="mval" id="dtBBid">—</span></div>
-
-<div class="mhdr" style="color:#10b981; border-left-color:#10b981;">🧠 10 DK. VADELİ AI ÖNGÖRÜ MOTORU</div>
-<button class="ai-predict-btn" onclick="generateFuture10MinPrediction()">🔮 1 Saatlik Veriyi Süz ve İlk 10 Dk. Tahmin Et</button>
-<div class="ai-window" id="aiPredictWindow" style="display:none;">
-    <div class="ai-win-title">
-        <span>🤖 DEEP-METRIC FUTURE TENDENCY</span>
-        <span style="color:#fbbf24;" id="aiPredictTime">Vade: +10 Dk</span>
+    <div class="card">
+      <div class="ctitle">🏆 Canlı Sıralama</div>
+      <div class="tabs2"><div class="tb2 up" id="tbUp">▲ En Çok Yükselen</div><div class="tb2" id="tbDn">▼ En Çok Düşen</div></div>
+      <div id="rankBox"></div>
     </div>
-    <div class="ai-win-metrics">
-        <div class="ai-m-box">
-            <div class="ai-m-lbl">1 Saatlik Hacim Akışı</div>
-            <div class="ai-m-val" id="aiMVolume" style="color:#e2e8f0;">Dengeli</div>
-        </div>
-        <div class="ai-m-box">
-            <div class="ai-m-lbl">Zirve Tamamlanma Durumu</div>
-            <div class="ai-m-val" id="aiMTop" style="color:#ff4757;">Belirsiz</div>
-        </div>
-        <div class="ai-m-box">
-            <div class="ai-m-lbl">Geri Dönüş Eğilimi</div>
-            <div class="ai-m-val" id="aiMReverse" style="color:#fbbf24;">Yatay Kontrol</div>
-        </div>
-        <div class="ai-m-box">
-            <div class="ai-m-lbl">Hedef Koridor (10 Dk.)</div>
-            <div class="ai-m-val" id="aiMTarget" style="color:#22c55e;">0.00 ₺</div>
-        </div>
+    <div class="card">
+      <div class="ctitle">⚡ Değişim Uyarıları <span class="cnt" id="alCnt">0</span></div>
+      <label class="fl">Eşik (%) — bu orandan fazla oynayan coin bildirilir</label>
+      <input type="number" id="alThr" value="1" step="0.5">
+      <div class="scroll" id="alLog" style="margin-top:10px"><div class="muted">Anlık değişimler burada listelenir...</div></div>
+      <button class="clrbtn" id="alClear" style="margin-top:8px">Temizle</button>
     </div>
-    <div class="ai-report-text" id="aiPredictReport">Grafik matrisi okunuyor...</div>
+    <div class="card">
+      <div class="ctitle">📡 Teknik Sinyaller (RSI) <span class="cnt" id="sgCnt">0</span></div>
+      <div class="scroll" id="sgBox"><div class="muted">Veri toplanıyor...</div></div>
+    </div>
+  </div>
+  <div class="bar">
+    <div class="qbox"><input id="q" placeholder="Coin ara (örn. FB, BTC, GS, ETH)..."><span id="qClear" class="qx">✕</span></div>
+    <div class="tabs"><span class="tab on" id="tabAll">Tümü</span><span class="tab" id="tabTRY">TRY</span><span class="tab" id="tabUSDT">USDT</span><span class="tab" id="tabFav">★ Favoriler</span></div>
+  </div>
+  <table>
+    <thead><tr><th></th><th>Çift</th><th>Son Fiyat</th><th>24s Değişim</th><th>Hacim</th><th>Grafik</th><th>İşlem</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
-
-<div class="mhdr">📊 TEKNİK ANALİZ</div>
-<div class="mrow"><span class="mlbl">Trend</span><span class="mval" id="dtTrend">—</span></div>
-<div class="mrow"><span class="mlbl">Hacim Durumu</span><span class="mval" id="dtVolS">—</span></div>
-<div class="mrow" style="background:rgba(162,28,172,0.15);padding:6px;border-radius:6px;border:1px dashed #c084fc;"><span class="mlbl" style="font-weight:bold;color:#f0abfc;font-size:0.9rem;">🧪 MFI (Para Akışı)</span><span class="mval" id="dtMFI" style="font-size:1.1rem;color:#f0abfc;font-weight:800;">—</span></div>
-<div class="mrow"><span class="mlbl">RSI</span><span class="mval" id="dtRSI">—</span></div>
-<div class="mrow"><span class="mlbl">MA10</span><span class="mval" id="dtMA">—</span></div>
-<div class="mrow"><span class="mlbl">⚡ Hız</span><span class="mval" id="dtSpeed">—</span></div>
-<div class="mrow"><span class="mlbl">⚖️ BTC Korelasyon</span><span class="mval" id="dtCorr">—</span></div>
-<div class="mrow" style="border:none;"><span class="mlbl">🕐 Geçmiş</span><span class="mval" id="dtHist" style="font-size:0.72rem;">—</span></div>
-<div class="mhdr" style="color:#ff4757;border-left-color:#ff4757;">🛑 STOP-LOSS</div>
-<div style="font-size:0.72rem;color:#94a3b8;margin-bottom:4px;">Alış fiyatından % kadar düşüşte alarm:</div>
-<div class="sl-input">
-<span style="font-size:0.72rem;color:#ff4757;font-weight:bold;white-space:nowrap;">Düşüş %:</span>
-<input type="number" id="slInput" placeholder="Örn: 5" oninput="setStopLoss()">
-<button class="palbtn" style="background:#ff4757;" onclick="clearStopLoss()">✕</button>
-</div>
-<div id="slStatus" style="font-size:0.7rem;color:#94a3b8;margin-top:3px;text-align:center;"></div>
-<div class="mhdr" style="color:#38ef7d;border-left-color:#38ef7d;">🔔 FİYAT ALARMI</div>
-<div class="pal">
-<span style="font-size:0.7rem;color:#fbbf24;font-weight:bold;white-space:nowrap;">Hedef:</span>
-<input type="number" id="palInput" placeholder="Fiyat gir..." oninput="setPriceAlert()">
-<button class="palbtn" onclick="clearPriceAlert()">✕</button>
-</div>
-<div id="palStatus" style="font-size:0.7rem;color:#94a3b8;margin-top:3px;text-align:center;"></div>
-<div class="mhdr" style="color:#38ef7d;border-left-color:#38ef7d;">🧠 DEEP-METRIC CANLI YAPAY ZEKA RAPORU</div>
-<div class="aibox" id="dtAI">Hesaplanıyor...</div>
-<div class="proxy-bar" style="margin-top: 10px; text-align: left; color:#64748b;">* Not: Bu pencere açıkken dip/zirve paneli arka planda güncellenmeye devam eder.</div>
-<button class="mcbtn" style="background:#ff4757;" onclick="closeDetail()">✕ Kapat</button>
-</div>
-</div>
-
-<div class="modal" id="alarmModal">
-<div class="mcard">
-<div class="mtitle" id="alTitle" style="color:#ff4757;">🚨 ALARM</div>
-<div class="mrow"><span class="mlbl">Coin</span><span class="mval" id="alName" style="color:#38ef7d;font-size:1rem;">—</span></div>
-<div class="mrow"><span class="mlbl">Anlık Fiyat</span><span class="mval" id="alPrice">—</span></div>
-<div class="mrow"><span class="mlbl">Eski Değer</span><span class="mval" id="alOld" style="color:#94a3b8;">—</span></div>
-<div class="mrow"><span class="mlbl">Yeni Değer</span><span class="mval" id="alNew" style="color:#38ef7d;">—</span></div>
-<div class="mrow"><span class="mlbl">Net Fark</span><span class="mval" id="alDiff" style="color:#fbbf24;">—</span></div>
-<div class="aibox" id="alMsg" style="margin-top:10px;">—</div>
-<button class="mcbtn" style="background:#22c55e;margin-top:10px;" onclick="closeAlarm()">✓ Anladım</button>
-</div>
-</div>
-
-<div class="modal" id="infoModal">
-<div class="mcard">
-<div class="mtitle" style="color:#3b82f6;">⚙️ SİSTEM BİLGİSİ</div>
-<div class="info-box">
-<b>📡 Bağlantı:</b> Engellenmeyen %100 canlı Binance Oracle veri motoru entegre edilmiştir.<br><br>
-<b>⚡ Mikro Takip:</b> Listelenen tüm coinlerde anlık %0.50'lik artı veya eksi yönlü fiyat değişimlerinde özel küçük bildirim penceresi açılır ve ses sinyali tetiklenir.<br><br>
-<b>💾 Veri Saklama:</b> Seçili coinler ve alarmlar kapatıp açınca korunur.<br><br>
-<b>🛑 Stop-Loss:</b> Belirtilen % düşüşte "Stop-Loss tetiklendi!" uyarısı.<br><br>
-<b>🔔 Fiyat Alarmı:</b> Hedef fiyata ulaşınca bildirim.
-</div>
-<button class="mcbtn" style="background:#3b82f6;" onclick="closeInfo()">Kapat</button>
-</div>
-</div>
+<div id="modalHost"></div>
 
 <script>
-"use strict";
+let favs=new Set(), search="", tab='all', rankMode='up';
+let alLog=[], sgList=[];
+let mkt={};      
+let market=[];   
+let lastOk = Date.now();
 
-var allCoins=[], filteredCoins=[];
-var selCoins=new Set(), custTargets={};
-var firedAlerts=new Set(), alarmQueue=[];
-var activePair=null, isTyping=false;
-var audioCtx=null;
-var top5Mode='up';
-var priceHistory={}, changeHistory={}, volHistory={}, volFired={};
-var mfiHistory={};
-var priceAlerts={}, stopLosses={};
-var firedPrice={}, firedSL={}, firedRSI={}, firedMA={};
-var signalLog=[], dataReadyCount=0;
-var deltaLog=[]; 
-var WARMUP=3; 
-var lastPricesMap={}; 
-var currentAnalysisTab = 'dip'; 
-
-function fmtP(v) {
-    var num = parseFloat(v);
-    if (isNaN(num) || num === 0) return "0,00 ₺";
-    var dec = 2;
-    if (num >= 100) dec = 2;
-    else if (num >= 1) dec = 4;
-    else dec = 6;
-    return num.toLocaleString('tr-TR', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + " ₺";
+function fmtVol(v){
+  v = Number(v) || 0;
+  return v.toLocaleString('tr-TR', {maximumFractionDigits: v >= 1000 ? 0 : 4});
+}
+function fmtRaw(v){
+  v = Number(v);
+  if(!isFinite(v)) return '0';
+  const a = Math.abs(v);
+  const d = a >= 1000 ? 2 : a >= 1 ? 4 : a >= 0.01 ? 6 : 10;
+  return v.toLocaleString('tr-TR', {maximumFractionDigits: d});
+}
+function fmtPct(v){
+  v = Number(v);
+  if(!isFinite(v)) return '0';
+  return v.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+function fmtMoney(v){
+  v = Number(v);
+  if(!isFinite(v)) return '0';
+  const a = Math.abs(v);
+  return v.toLocaleString('tr-TR', {maximumFractionDigits: a >= 1 ? 2 : a >= 0.01 ? 4 : 8});
 }
 
-async function fetchPrices() {
-    try {
-        var response = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
-        if (!response.ok) throw new Error('Network response error');
-        var data = await response.json();
-        
-        var normalizedList = [];
-        data.forEach(function(item) {
-            if (item.symbol && item.symbol.endsWith('TRY')) {
-                var rawPrice = parseFloat(item.lastPrice || 0);
-                var rawOpen = parseFloat(item.openPrice || 0);
-                var rawHigh = parseFloat(item.highPrice || 0);
-                var rawLow = parseFloat(item.lowPrice || 0);
-                var rawVol = parseFloat(item.volume || 0);
-                var rawChange = parseFloat(item.priceChangePercent || 0);
-                
-                normalizedList.push({
-                    pair: item.symbol,
-                    pairNormalized: item.symbol.replace('TRY', '_TRY'),
-                    last: rawPrice,
-                    open: rawOpen,
-                    high: rawHigh,
-                    low: rawLow,
-                    volume: rawVol,
-                    dailyPercent: rawChange,
-                    bid: rawPrice * 0.9998,
-                    ask: rawPrice * 1.0002,
-                    askVolume: rawVol * 0.45,
-                    bidVolume: rawVol * 0.55
-                });
-            }
-        });
+function spark(h,up){
+  if(!h||h.length<2) return '';
+  const w=80,ht=28,mn=Math.min(...h),mx=Math.max(...h),r=(mx-mn)||1;
+  const pts=h.map((v,i)=>`${(i/(h.length-1)*w).toFixed(1)},${(ht-((v-mn)/r)*ht).toFixed(1)}`).join(' ');
+  return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none"><polyline fill="none" stroke="${up?'var(--green)':'var(--red)'}" stroke-width="1.5" points="${pts}"/></svg>`;
+}
 
-        if (normalizedList.length === 0) throw new Error('Data empty');
-        normalizedList.sort(function(a, b) { return a.pair.localeCompare(b.pair); });
-        onData(normalizedList, 'Binance Oracle Engine (Canlı Teknik Modül)');
+function bigChart(h,up){
+  const w=420,ht=120,pd=6;
+  if(!h||h.length<2) return `<div class="cwrap" style="height:${ht}px;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12px">Veri toplanıyor…</div>`;
+  let mn=Math.min(...h),mx=Math.max(...h);
+  if(mx===mn){ const e=Math.abs(mx)*0.001||1e-9; mn-=e; mx+=e; }
+  const r=mx-mn;
+  const X=i=>(i/(h.length-1)*(w-pd*2)+pd);
+  const Y=v=>(ht-pd-((v-mn)/r)*(ht-pd*2));
+  const line=h.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const area=`${pd},${ht-pd} ${line} ${(w-pd)},${ht-pd}`;
+  const col=up?'var(--green)':'var(--red)';
+  const gid=up?'gradUp':'gradDn';
+  const ly=Y(h[h.length-1]);
+  return `<div class="cwrap" style="--dotc:${col}"><svg viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity="0.35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><polygon fill="url(#${gid})" points="${area}"/><line x1="${pd}" x2="${w-pd}" y1="${ly.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4 4" opacity=".5" vector-effect="non-scaling-stroke"/><polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${line}"/></svg><span class="pdot" style="left:${((w-pd)/w*100).toFixed(2)}%;top:${(ly/ht*100).toFixed(2)}%"></span></div>`;
+}
 
-    } catch(e) {
-        var el = document.getElementById('connSt');
-        if (el) { el.className = 's-off'; el.innerText = '● YENİDEN BAĞLANIYOR...'; }
-        setTimeout(fetchPrices, 3000);
+function rsi(h){
+  if(h.length<6)return 50;
+  let g=0,l=0,n=Math.min(h.length-1,14);
+  for(let i=h.length-n;i<h.length;i++){
+    let d=h[i]-h[i-1];
+    if(d>0)g+=d;else l-=d;
+  }
+  if(g+l===0)return 50;
+  return Math.round(100-(100/(1+(g/(l||1e-9)))));
+}
+
+function renderTable(){
+  const rows=market.filter(c=>{
+    if(tab==='fav'&&!favs.has(c.s))return false;
+    if((tab==='TRY'||tab==='USDT')&&c.q!==tab)return false;
+    if(search){
+      const q=search.toLowerCase();
+      if(!c.s.toLowerCase().includes(q) && !c.n.toLowerCase().includes(q)) return false;
     }
-}
+    return true;
+  });
 
-function onData(data, srcName) {
-    var el = document.getElementById('connSt');
-    if (el) { el.className = 's-on'; el.innerText = '● AKTİF'; }
-    document.getElementById('lastUpd').innerText = new Date().toLocaleTimeString('tr-TR');
-    var bar = document.getElementById('proxyBar');
-    if (bar) bar.innerText = 'Kaynak: ' + srcName;
-    
-    checkDeltaAlerts(data);
+  const tb=document.getElementById('tbody');
+  if(!tb) return;
 
-    var priceDiffs = {};
-    data.forEach(function(newCoin) {
-        var oldCoin = allCoins.find(function(x) { return x.pair === newCoin.pair; });
-        if (oldCoin) {
-            if (newCoin.last > oldCoin.last) {
-                priceDiffs[newCoin.pair] = 'up';
-            } else if (newCoin.last < oldCoin.last) {
-                priceDiffs[newCoin.pair] = 'down';
-            }
-        }
-    });
+  rows.forEach(c => {
+    const ch = c.dp || 0;
+    const up = ch >= 0;
+    let tr = tb.querySelector(`tr[data-s="${c.s}"]`);
+    
+    if(!tr) {
+      tr = document.createElement('tr');
+      tr.className = 'crow';
+      tr.setAttribute('data-s', c.s);
+      tr.innerHTML = `
+        <td class="star ${favs.has(c.s)?'on':''}" data-fav="${c.s}">★</td>
+        <td class="pair" data-open="${c.s}"><span class="ico">${c.s[0]}</span><b>${c.b}</b><span class="sub">/${c.q}</span><span class="nm">${c.n}</span><span class="alarm-icon">${c.alarm?' 🔔':''}</span></td>
+        <td class="price">${fmtRaw(c.price)}</td>
+        <td class="chg ${up?'g':'r'}">${up?'+':''}${fmtPct(ch)}%</td>
+        <td class="vol">${fmtVol(c.vb)} ${c.b}</td>
+        <td class="sp">${spark(c.hist,up)}</td>
+        <td><button class="tbtn g" data-open="${c.s}">Al</button><button class="tbtn r" data-open="${c.s}">Sat</button></td>
+      `;
+      tb.appendChild(tr);
 
-    allCoins = data;
-    updateHistories(data);
-    checkAllAlarms(data);
-    updatePnlDrop();
-    calcPnl();
-    renderTop5();
-    if (!isTyping) doRender();
-    if (activePair) updateDetailUI();
-    
-    Object.keys(priceDiffs).forEach(function(pair) {
-        var rowEl = document.querySelector('[data-pair="' + pair + '"]');
-        if (rowEl) {
-            if (priceDiffs[pair] === 'up') {
-                rowEl.classList.add('flash-green');
-                setTimeout(function() { rowEl.classList.remove('flash-green'); }, 400);
-            } else {
-                rowEl.classList.add('flash-red');
-                setTimeout(function() { rowEl.classList.remove('flash-red'); }, 400);
-            }
-        }
-    });
-    
-    if(document.getElementById('analysisModal').style.display === 'flex') {
-        renderAnalysisContent();
+      tr.querySelector('[data-fav]').onclick = (e) => {
+        e.stopPropagation();
+        favs.has(c.s)?favs.delete(c.s):favs.add(c.s);
+        renderTable();
+      };
+      tr.querySelectorAll('[data-open]').forEach(el => el.onclick = (e) => {
+        e.stopPropagation();
+        openDetail(c.s);
+      });
+    } else {
+      if(c.flash) {
+        tr.classList.remove('flash-g', 'flash-r');
+        void tr.offsetWidth;
+        tr.classList.add(c.flash === 'up' ? 'flash-g' : 'flash-r');
+        c.flash = null;
+      }
+
+      tr.querySelector('.price').textContent = fmtRaw(c.price);
+      const chgTd = tr.querySelector('.chg');
+      chgTd.textContent = `${up?'+':''}${fmtPct(ch)}%`;
+      chgTd.className = `chg ${up?'g':'r'}`;
+      
+      const volTd = tr.querySelector('.vol');
+      if(volTd) volTd.textContent = `${fmtVol(c.vb)} ${c.b}`;
+      
+      const spTd = tr.querySelector('.sp');
+      if(spTd) spTd.innerHTML = spark(c.hist, up);
+      
+      const alarmSpan = tr.querySelector('.alarm-icon');
+      if(alarmSpan) alarmSpan.textContent = c.alarm ? ' 🔔' : '';
     }
+  });
+
+  Array.from(tb.querySelectorAll('tr[data-s]')).forEach(tr => {
+    const s = tr.getAttribute('data-s');
+    if(!rows.find(c => c.s === s)) tr.remove();
+  });
+
+  if(!rows.length) {
+    tb.innerHTML = `<tr><td colspan=7 class="empty">${market.length?'Sonuç bulunamadı':'🔄 Piyasa verileri yükleniyor...'}</td></tr>`;
+  }
 }
 
-function checkDeltaAlerts(newData) {
-    if (dataReadyCount < WARMUP) return; 
-    
-    newData.forEach(function(coin) {
-        var p = coin.pair;
-        var currentPrice = parseFloat(coin.last);
-        
-        if (lastPricesMap[p] !== undefined) {
-            var oldPrice = lastPricesMap[p];
-            if (oldPrice > 0) {
-                var deltaPercent = ((currentPrice - oldPrice) / oldPrice) * 100;
-                
-                if (deltaPercent >= 0.50) {
-                    addDeltaLog(p, 'UP', deltaPercent);
-                } 
-                else if (deltaPercent <= -0.50) {
-                    addDeltaLog(p, 'DOWN', deltaPercent);
-                }
-            }
-        }
-        lastPricesMap[p] = currentPrice;
-    });
+function renderRanks(){
+  const sorted=[...market].sort((a,b)=>(rankMode==='up' ? (b.dp - a.dp) : (a.dp - b.dp))).slice(0,8);
+  document.getElementById('rankBox').innerHTML=sorted.map((c,i)=>{
+    const ch=c.dp||0, up=ch>=0;
+    return `<div class="rkrow" data-open="${c.s}"><span class="rk">${i+1}</span><span class="ico" style="width:20px;height:20px;font-size:10px">${c.s[0]}</span><span class="nm">${c.s}</span><span class="pr">${fmtRaw(c.price)}</span><span class="ch ${up?'g':'r'}">${up?'+':''}${fmtPct(ch)}%</span></div>`;
+  }).join('');
+  document.getElementById('rankBox').querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openDetail(el.dataset.open));
 }
 
-function addDeltaLog(p, direction, diff) {
-    deltaLog.unshift({
-        p: p,
-        dir: direction,
-        diff: diff,
-        t: new Date().toLocaleTimeString('tr-TR')
-    });
-    if(deltaLog.length > 50) deltaLog.pop();
-    renderDeltaLogs();
+function renderSignals(){
+  sgList=[];
+  market.forEach(c=>{const r=rsi(c.hist);if(r>=70)sgList.push({s:c.s,r,t:'ob'});else if(r<=30)sgList.push({s:c.s,r,t:'os'});});
+  sgList.sort((a,b)=>b.t==='ob'?b.r-a.r:a.r-b.r);
+  document.getElementById('sgCnt').textContent=sgList.length;
+  const box=document.getElementById('sgBox');
+  box.innerHTML=sgList.length?sgList.slice(0,12).map(x=>`<div class="sgrow" data-open="${x.s}"><span class="nm">${x.s}</span><span class="tag ${x.t}">${x.t==='ob'?'AŞIRI ALIM':'AŞIRI SATIM'} · RSI ${x.r}</span></div>`).join(''):'<div class="muted">Henüz sinyal yok</div>';
+  box.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openDetail(el.dataset.open));
 }
 
-function renderDeltaLogs() {
-    document.getElementById('deltaCount').innerText = deltaLog.length;
-    var el = document.getElementById('deltaList');
-    if(!deltaLog.length) { 
-        el.innerHTML = '<div style="text-align:center;color:#475569;font-size:0.78rem;padding:10px;">Anlık değişimler burada arşivlenir...</div>'; 
-        return; 
+function buildPnlOptions(){
+  const sel=document.getElementById('pnlCoin');
+  if(sel.options.length-1===market.length)return;
+  const keep=sel.value;
+  sel.innerHTML='<option value="">— Coin seç —</option>'+market.map(c=>`<option value="${c.s}">${c.b}/${c.q}</option>`).join('');
+  sel.value=keep;
+}
+
+function calcPnl(){
+  const s=document.getElementById('pnlCoin').value;
+  const c=market.find(x=>x.s===s);
+  const cur=document.getElementById('pnlCur'),val=document.getElementById('pnlVal'),pct=document.getElementById('pnlPct'),sub=document.getElementById('pnlSub');
+  if(!c){cur.textContent='—';val.textContent='Coin seçiniz';val.className='val y';pct.textContent='';sub.textContent='';return;}
+  cur.textContent=fmtRaw(c.price)+' '+c.q;
+  const amt=parseFloat(document.getElementById('pnlAmt').value)||0;
+  const buy=parseFloat(document.getElementById('pnlBuy').value)||0;
+  if(amt<=0||buy<=0){val.textContent='Miktar & alış gir';val.className='val y';pct.textContent='';sub.textContent='';return;}
+  const diff=(c.price-buy)*amt,p=(c.price-buy)/buy*100,up=diff>=0;
+  val.textContent=(up?'+':'')+fmtMoney(diff)+' '+c.q;val.className='val '+(up?'g':'r');
+  pct.textContent=(up?'+':'')+fmtPct(p)+'%';pct.className='pct '+(up?'g':'r');
+  sub.textContent='Maliyet '+fmtMoney(buy*amt)+' → Güncel '+fmtMoney(c.price*amt)+' '+c.q;
+}
+
+function toast(kind,title,body){
+  const w=document.getElementById('toastWrap');
+  const d=document.createElement('div');d.className='toast '+kind;
+  d.innerHTML=`<div class="th"><span>${title}</span></div><div class="tbd">${body}</div>`;
+  d.onclick=()=>d.remove();
+  w.appendChild(d);
+  setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400);},6000);
+  while(w.children.length>5)w.removeChild(w.firstChild);
+}
+
+function checkAlerts(){
+  const thr=Math.abs(parseFloat(document.getElementById('alThr').value)||1);
+  market.forEach(c=>{
+    if(c.hist.length>=2){
+      const prev=c.hist[c.hist.length-2],d=(c.price-prev)/prev*100;
+      if(Math.abs(d)>=thr){
+        const up=d>=0;
+        alLog.unshift({s:c.s,d,t:new Date().toLocaleTimeString('tr-TR'),up});
+        if(alLog.length>60)alLog.pop();
+        toast(up?'up':'down',(up?'▲ ':'▼ ')+c.s,`Anlık ${up?'+':''}${fmtRaw(d)}% · ${fmtRaw(c.price)} ${c.q}`);
+      }
     }
-    var h = '';
-    deltaLog.forEach(function(d){
-        var color = d.dir === 'UP' ? '#22c55e' : '#ff4757';
-        var sign = d.dir === 'UP' ? '▲' : '▼';
-        h += '<div class="delta-row" onclick="openDetail(\''+d.p+'\')">' +
-             '<span class="delta-nm">'+d.p.replace('TRY','')+'</span>' +
-             '<span class="delta-val" style="color:'+color+'; font-weight:bold;">'+sign+' %'+Math.abs(d.diff).toFixed(2)+'</span>' +
-             '<span class="delta-time">'+d.t+'</span>' +
-             '</div>';
-    });
-    el.innerHTML = h;
-}
-
-function clearDeltaLogs(){ deltaLog = []; renderDeltaLogs(); }
-function toggleDeltaList(){ var cls = document.getElementById('chkDeltaOpen').checked ? 'delta-list open' : 'delta-list'; document.getElementById('deltaList').className = cls; }
-
-function initAudio() {
-    try {
-        if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    } catch(e) {}
-}
-['click','touchstart','mousedown','keydown','scroll'].forEach(function(evt) {
-    document.addEventListener(evt, initAudio, { passive: true });
-});
-
-function bip(freq, t, dur, vol) {
-    try {
-        if (!audioCtx || audioCtx.state !== 'running') return;
-        var o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.type = 'sine'; o.frequency.setValueAtTime(freq, t);
-        g.gain.setValueAtTime(vol || 0.2, t);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(t); o.stop(t + dur);
-    } catch(e) {}
-}
-
-function saveAll() {
-    try {
-        localStorage.setItem('ktData', JSON.stringify({
-            sel: Array.from(selCoins), ct: custTargets, pa: priceAlerts, sl: stopLosses
-        }));
-    } catch(e) {}
-}
-
-function loadAll() {
-    try {
-        var s = localStorage.getItem('ktData');
-        if (s) { var d = JSON.parse(s); if(d.sel) selCoins=new Set(d.sel); if(d.ct) custTargets=d.ct; if(d.pa) priceAlerts=d.pa; if(d.sl) stopLosses=d.sl; }
-        var g = localStorage.getItem('ktG'); if(g) document.getElementById('globalTarget').value = g;
-        var ot = localStorage.getItem('ktOT'); if(ot) document.getElementById('chkOnlyTarget').checked = ot==='1';
-        var os = localStorage.getItem('ktOS'); if(os) document.getElementById('chkOnlySel').checked = os==='1';
-    } catch(e) {}
-}
-function savePrefs() {
-    try {
-        localStorage.setItem('ktG', document.getElementById('globalTarget').value);
-        localStorage.setItem('ktOT', document.getElementById('chkOnlyTarget').checked?'1':'0');
-        localStorage.setItem('ktOS', document.getElementById('chkOnlySel').checked?'1':'0');
-        saveAll();
-    } catch(e) {}
-}
-
-function tick() { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('tr-TR'); }
-setInterval(tick, 1000);
-
-function updateHistories(data) {
-    var now = Date.now();
-    data.forEach(function(c) {
-        if (!c.pair) return;
-        var p = c.pair;
-        
-        if (lastPricesMap[p] === undefined) {
-            lastPricesMap[p] = parseFloat(c.last);
-        }
-
-        if (!priceHistory[p]) priceHistory[p] = [];
-        priceHistory[p].push(parseFloat(c.last));
-        if (priceHistory[p].length > 30) priceHistory[p].shift();
-
-        if (!changeHistory[p]) changeHistory[p] = [];
-        changeHistory[p].push({ t: now, v: parseFloat(c.dailyPercent) });
-        if (changeHistory[p].length > 720) changeHistory[p].shift();
-
-        if (!volHistory[p]) volHistory[p] = [];
-        volHistory[p].push(parseFloat(c.volume));
-        if (volHistory[p].length > 15) volHistory[p].shift();
-
-        if (!mfiHistory[p]) mfiHistory[p] = [];
-        var tp = (parseFloat(c.high) + parseFloat(c.low) + parseFloat(c.last)) / 3;
-        mfiHistory[p].push({ tp: tp, vol: parseFloat(c.volume) });
-        if (mfiHistory[p].length > 15) mfiHistory[p].shift();
-    });
-}
-
-function calcMFI(pair) {
-    var h = mfiHistory[pair]; if (!h || h.length < 5) return 50;
-    var posFlow=0, negFlow=0, startIdx = Math.max(1, h.length-14);
-    for (var i=startIdx; i<h.length; i++) {
-        var rawMF = h[i].tp * (h[i].vol - h[i-1].vol);
-        if (rawMF < 0) rawMF = h[i].tp * h[i].vol * 0.1;
-        if (h[i].tp > h[i-1].tp) posFlow += rawMF;
-        else if (h[i].tp < h[i-1].tp) negFlow += rawMF;
+    if(c.alarm){
+      const a=c.alarm;
+      if((a.dir==='up'&&c.price>=a.price)||(a.dir==='down'&&c.price<=a.price)){
+        toast('alarm','🔔 '+c.s+' Alarmı',`Fiyat ${a.dir==='up'?'≥':'≤'} ${fmtRaw(a.price)} ${c.q} oldu · şu an ${fmtRaw(c.price)}`);
+        c.alarm=null;
+      }
     }
-    if (posFlow+negFlow === 0) return 50;
-    if (negFlow === 0) return 100;
-    return Math.round(100 - (100 / (1 + posFlow/negFlow)));
+  });
+  document.getElementById('alCnt').textContent=alLog.length;
+  const box=document.getElementById('alLog');
+  box.innerHTML=alLog.length?alLog.slice(0,30).map(x=>`<div class="lgrow" data-open="${x.s}"><span class="nm">${x.s}</span><span class="ch ${x.up?'g':'r'}">${x.up?'+':''}${fmtRaw(x.d)}%</span><span class="tm">${x.t}</span></div>`).join(''):'<div class="muted">Anlık değişimler burada listelenir...</div>';
+  box.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openDetail(el.dataset.open));
 }
-function calcRSI(pair) {
-    var h = priceHistory[pair]; if (!h || h.length < 5) return 50;
-    var g=0, l=0, n=Math.min(h.length-1,14);
-    for (var i=h.length-n; i<h.length; i++) { var d=h[i]-h[i-1]; if(d>0) g+=d; else l-=d; }
-    if (g+l === 0) return 50;
-    return Math.round(100-(100/(1+(g/(l||0.0001)))));
-}
-function calcMA(pair, per) {
-    per = per||10; var h = priceHistory[pair]; if (!h || h.length < per) return null;
-    return h.slice(-per).reduce(function(a,b){return a+b;},0)/per;
-}
-function calcSpeed(pair) {
-    var h = priceHistory[pair]; if (!h || h.length < 3) return '';
-    var d = Math.abs(h[h.length-1]-h[h.length-3]), p = (d/(h[h.length-3]||1))*100;
-    return p>0.15?'⚡ HIZLI':p>0.05?'→ ORTA':'· YAVAŞ';
-}
-function calcCorr(pair) {
-    if (pair==='BTCTRY') return '— BTC kendisi';
-    var bh=changeHistory['BTCTRY'], ch2=changeHistory[pair];
-    if (!bh||!ch2||bh.length<10||ch2.length<10) return 'Veri bekleniyor...';
-    var n=Math.min(bh.length,ch2.length,30), bv=bh.slice(-n).map(function(x){return x.v;}), cv=ch2.slice(-n).map(function(x){return x.v;});
-    var sx=0,sy=0,sxy=0,sx2=0,sy2=0;
-    for (var i=0;i<n;i++){sx+=bv[i];sy+=cv[i];sxy+=bv[i]*cv[i];sx2+=bv[i]*bv[i];sy2+=cv[i]*cv[i];}
-    var num=n*sxy-sx*sy, den=Math.sqrt((n*sx2-sx*sx)*(n*sy2-sy*sy));
-    if (den===0) return '-';
-    var r=(num/den).toFixed(2);
-    return r>0.6?'🟢 Güçlü (+'+r+')':r>0.2?'🟡 Zayıf (+'+r+')':r<-0.2?'🔴 Ters ('+r+')':'⚪ Yok ('+r+')';
-}
-function calcHistSummary(pair) {
-    var h=changeHistory[pair]; if(!h||h.length<2) return '-';
-    var f=h[0].v, l=h[h.length-1].v, mx=Math.max.apply(null,h.map(function(x){return x.v;})), mn=Math.min.apply(null,h.map(function(x){return x.v;}));
-    return 'Son '+Math.max(1,Math.round((h[h.length-1].t-h[0].t)/60000))+'dk: '+(l-f>=0?'+':'')+(l-f).toFixed(2)+'% | Max:'+mx.toFixed(2)+'% | Min:'+mn.toFixed(2)+'%';
-}
-function calcMetrics(c) {
-    var l=parseFloat(c.last), o=parseFloat(c.open), ch=parseFloat(c.dailyPercent);
-    return {
-        trend: (l>o&&ch>0)?'Yükseliş 📈':'Düşüş 📉',
-        volS: (ch>1.5&&parseFloat(c.volume)>2000000)?'Güçlü 🔼':'Normal 📊',
-        rsi: calcRSI(c.pair)
+
+let detailSym=null;
+function openDetail(sym){detailSym=sym;renderDetail(true);}
+function closeDetail(){detailSym=null;document.getElementById('modalHost').innerHTML='';}
+function renderDetail(rebuild){
+  if(!detailSym)return;
+  const c=market.find(x=>x.s===detailSym);if(!c)return;
+  const ch=c.dp||0,up=ch>=0,bid=c.bid||c.price,ask=c.ask||c.price;
+  const host=document.getElementById('modalHost');
+  if(rebuild){
+    host.innerHTML=`<div class="modal" id="dmodal"><div class="mcard">
+      <div class="mhead"><div class="mtit"><span class="ico">${c.s[0]}</span><div><b>${c.b}/${c.q}</b><div class="nm">${c.n}</div></div></div><span class="close" id="dx">✕</span></div>
+      <div class="mprice"><div class="big" id="dBig"></div><div class="chg" id="dChg" style="font-size:16px"></div></div>
+      <div class="mchart"><div class="ct"><span>Canlı Grafik (son fiyatlar)</span><span id="dRange"></span><span class="lv" id="dLv"></span></div><div id="dChart"></div></div>
+      <div class="mgrid">
+        <div class="mi"><span>En İyi Alış</span><b class="g" id="dBid"></b></div>
+        <div class="mi"><span>En İyi Satış</span><b class="r" id="dAsk"></b></div>
+        <div class="mi"><span>24s En Düşük</span><b id="dLow"></b></div>
+        <div class="mi"><span>24s En Yüksek</span><b id="dHigh"></b></div>
+        <div class="mi"><span>RSI (14)</span><b id="dRsi"></b></div>
+        <div class="mi"><span>24s Hacim (${c.b})</span><b id="dVol"></b></div>
+        <div class="mi"><span>24s Hacim (${c.q})</span><b id="dVolQ"></b></div>
+      </div>
+      <div class="mhd">🔔 Fiyat Alarmı Kur</div>
+      <div class="alarmbox"><input type="number" id="dAlarm" placeholder="Hedef fiyat (${c.q})"><button id="dAlarmBtn">Alarm Kur</button></div>
+      <div id="dAlarmInfo" style="font-size:12px;color:var(--sub);margin-bottom:12px"></div>
+      <div class="mbtns"><button class="tbtn g big2">Al</button><button class="tbtn r big2">Sat</button></div>
+    </div></div>`;
+    document.getElementById('dmodal').onclick=e=>{if(e.target.id==='dmodal')closeDetail();};
+    document.getElementById('dx').onclick=closeDetail;
+    document.getElementById('dAlarmBtn').onclick=()=>{
+      const v=parseFloat(document.getElementById('dAlarm').value);
+      if(!v||v<=0){document.getElementById('dAlarmInfo').textContent='Geçerli bir fiyat girin.';return;}
+      c.alarm={price:v,dir:v>=c.price?'up':'down'};
+      renderTable();updateAlarmInfo(c);
     };
+  }
+  const g=id=>document.getElementById(id);
+  if(!g('dBig'))return;
+  g('dBig').innerHTML=fmtRaw(c.price)+' <span>'+c.q+'</span>';g('dBig').className='big '+(up?'g':'r');
+  g('dChg').textContent=(up?'▲ +':'▼ ')+fmtPct(ch)+'%';g('dChg').className='chg '+(up?'g':'r');
+  
+  g('dBid').textContent=fmtRaw(bid);
+  g('dAsk').textContent=fmtRaw(ask);
+  g('dLow').textContent=fmtRaw(c.low);
+  g('dHigh').textContent=fmtRaw(c.high);
+  g('dRsi').textContent=rsi(c.hist);
+  g('dVol').textContent=fmtVol(c.vb);
+  g('dVolQ').textContent=fmtVol(c.vol);
+  
+  const ce=g('dChart');if(ce)ce.innerHTML=bigChart(c.hist,up);
+  const rg=g('dRange');if(rg&&c.hist.length>1)rg.textContent='Min '+fmtRaw(Math.min(...c.hist))+' · Maks '+fmtRaw(Math.max(...c.hist))+'  ';
+  const lv=g('dLv');if(lv){lv.textContent=fmtRaw(c.price)+' '+c.q;lv.style.color=up?'var(--green)':'var(--red)';}
+  updateAlarmInfo(c);
+}
+function updateAlarmInfo(c){const el=document.getElementById('dAlarmInfo');if(!el)return;el.innerHTML=c.alarm?`Aktif alarm: fiyat <b class="y">${c.alarm.dir==='up'?'≥':'≤'} ${fmtRaw(c.alarm.price)} ${c.q}</b> olunca bildirilecek.`:'Henüz alarm yok.';}
+
+document.getElementById('q').oninput=e=>{search=e.target.value;document.getElementById('qClear').classList.toggle('show',!!search);renderTable();};
+document.getElementById('qClear').onclick=()=>{search='';const q=document.getElementById('q');q.value='';document.getElementById('qClear').classList.remove('show');renderTable();q.focus();};
+document.getElementById('tabAll').onclick=()=>{tab='all';document.getElementById('tabAll').classList.add('on');document.getElementById('tabFav').classList.remove('on');renderTable();};
+document.getElementById('tabFav').onclick=()=>{tab='fav';document.getElementById('tabFav').classList.add('on');document.getElementById('tabAll').classList.remove('on');renderTable();};
+document.getElementById('tbUp').onclick=()=>{rankMode='up';document.getElementById('tbUp').className='tb2 up';document.getElementById('tbDn').className='tb2';renderRanks();};
+document.getElementById('tbDn').onclick=()=>{rankMode='dn';document.getElementById('tbDn').className='tb2 dn';document.getElementById('tbUp').className='tb2';renderRanks();};
+document.getElementById('pnlCoin').onchange=calcPnl;
+document.getElementById('pnlAmt').oninput=calcPnl;
+document.getElementById('pnlBuy').oninput=calcPnl;
+document.getElementById('alClear').onclick=()=>{alLog=[];checkAlerts();};
+
+function setConn(ok){
+  const el=document.getElementById('conn');
+  const banner=document.getElementById('staleBanner');
+  if(el){
+    el.textContent=ok?('● CANLI · '+srcName+' · '+market.length+' çift'):'● BAĞLANTI KESİLDİ';
+    el.style.color=ok?'var(--green)':'var(--red)';
+  }
+  if(banner){
+    banner.style.display = ok ? 'none' : 'block';
+  }
 }
 
-function checkAllAlarms(data) {
-    if (dataReadyCount < WARMUP) dataReadyCount++;
-    var warm = (dataReadyCount >= WARMUP);
-    data.forEach(function(c) {
-        if (!c.pair) return;
-        var p=c.pair, cur=parseFloat(c.last), rsi=calcRSI(p);
-        if (volHistory[p] && volHistory[p].length >= 4) {
-            var pv=volHistory[p].slice(0,-1), av=pv.reduce(function(a,b){return a+b;},0)/pv.length, vc=volHistory[p][volHistory[p].length-1];
-            if (av>0 && vc>av*1.5 && !volFired[p]) {
-                volFired[p]=true; if(warm && selCoins.has(p)) { pushAlarm(p, 'HACİM', av, vc, 'Hacim patlaması yaşanıyor!'); }
-            }
-        }
-        if(rsi>75 && !firedRSI[p+'ob']){ firedRSI[p+'ob']=true; addSignal(p,'RSI_OB','Aşırı Alım (Tepe)'); }
-        if(rsi<25 && !firedRSI[p+'os']){ firedRSI[p+'os']=true; addSignal(p,'RSI_OS','Aşırı Satış (Dip)'); }
-        if(priceAlerts[p]) {
-            var tgt=priceAlerts[p];
-            if(!firedPrice[p] && cur>=tgt) { firedPrice[p]=true; pushAlarm(p,'HEDEF',tgt,cur,'Hedef fiyatına ulaşıldı!'); }
-        }
-        if(stopLosses[p]) {
-            var slPrice=stopLosses[p];
-            if(!firedSL[p] && cur<=slPrice) { firedSL[p]=true; pushAlarm(p,'STOP-LOSS',slPrice,cur,'Stop-Loss seviyesi tetiklendi!'); }
-        }
-    });
-}
-
-function pushAlarm(p, type, oldV, newV, msg) {
-    alarmQueue.push({pair:p, type:type, oldV:oldV, newV:newV, msg:msg});
-    if(alarmQueue.length===1) showNextAlarm();
-}
-function showNextAlarm() {
-    if(!alarmQueue.length) return;
-    var a=alarmQueue[0];
-    document.getElementById('alName').innerText=a.pair.replace('TRY','');
-    document.getElementById('alTitle').innerText='🚨 ' + a.type + ' ALARMI';
-    document.getElementById('alPrice').innerText=fmtP(a.newV);
-    document.getElementById('alOld').innerText=a.oldV;
-    document.getElementById('alNew').innerText=a.newV;
-    document.getElementById('alDiff').innerText=a.msg;
-    document.getElementById('alMsg').innerText=a.pair + ' paritesinde kritik durum!';
-    document.getElementById('alarmModal').style.display='flex';
-}
-function closeAlarm() {
-    document.getElementById('alarmModal').style.display='none';
-    alarmQueue.shift();
-    setTimeout(showNextAlarm, 300);
-}
-
-function addSignal(p,type,desc) {
-    signalLog.unshift({p:p,type:type,desc:desc,t:new Date().toLocaleTimeString('tr-TR')});
-    if(signalLog.length>40) signalLog.pop();
-    renderSignals();
-}
-function renderSignals() {
-    document.getElementById('sigCount').innerText=signalLog.length;
-    var el=document.getElementById('sigList');
-    if(!signalLog.length) { el.innerHTML='<div style="text-align:center;color:#475569;font-size:0.78rem;padding:10px;">Sinyal yok...</div>'; return; }
-    var h='';
-    signalLog.forEach(function(s){
-        var cls=s.type==='RSI_OB'?'sig-rsi-ob':'sig-rsi-os';
-        h+='<div class="sig-row" onclick="openDetail(\''+s.p+'\')"><span class="sig-nm">'+s.p.replace('TRY','')+'</span><span class="sig-type '+cls+'">'+s.desc+'</span><span class="sig-time">'+s.t+'</span></div>';
-    });
-    el.innerHTML=h;
-}
-function clearSignals(){ signalLog=[]; renderSignals(); }
-function toggleSigList(){ var cls=document.getElementById('chkSigOpen').checked?'sig-list open':'sig-list'; document.getElementById('sigList').className=cls; }
-
-function doRender() {
-    var el=document.getElementById('coinList');
-    var sInput=document.getElementById('searchInput').value.toUpperCase().trim();
-    var globT=parseFloat(document.getElementById('globalTarget').value||-999);
-    var onlyT=document.getElementById('chkOnlyTarget').checked;
-    var onlyS=document.getElementById('chkOnlySel').checked;
+function processData(list){
+  if(!list || !list.length) return;
+  list.forEach(i=>{
+    const sym = i.pair || i.pairSymbol || i.symbol || i.s || '';
+    if(!sym) return;
     
-    var list = allCoins;
-    if(sInput) list=list.filter(function(c){return c.pair.includes(sInput);});
-    if(onlyS) list=list.filter(function(c){return selCoins.has(c.pair);});
-    if(onlyT && globT!==-999) list=list.filter(function(c){return c.dailyPercent>=globT;});
-    
-    if(!list.length) { el.innerHTML='<div class="no-coin">Listelenecek coin bulunamadı.</div>'; return; }
-    
-    var h='';
-    list.forEach(function(c){
-        var isCh=selCoins.has(c.pair)?'checked':'';
-        var arrColor=c.dailyPercent>=0?'#22c55e':'#ff4757';
-        var sign=c.dailyPercent>=0?'+':'';
-        var m=calcMetrics(c);
-        
-        h+='<div class="crow" data-pair="'+c.pair+'" style="border-left-color:'+arrColor+'" onclick="handleRowClick(event,\''+c.pair+'\')">';
-        h+='<div class="crow-top">';
-        h+='<div class="cchk"><input type="checkbox" '+isCh+' onclick="handleCheck(event,\''+c.pair+'\')"></div>';
-        h+='<div class="cbody">';
-        h+='<div class="ctop"><span class="cname">'+c.pair.replace('TRY','')+' <span style="font-size:0.68rem;color:#64748b;">/TRY</span></span><span class="cchg" style="color:'+arrColor+'">'+sign+c.dailyPercent.toFixed(2)+'%</span></div>';
-        h+='<div class="cmid">Trend: '+m.trend+' <span class="badge bd-fast">RSI: '+m.rsi+'</span>';
-        if(priceAlerts[c.pair]) h+=' <span class="badge bd-ma">🔔</span>';
-        if(stopLosses[c.pair]) h+=' <span class="badge bd-sl">🛑</span>';
-        h+='</div>';
-        h+='<div class="cprice">'+fmtP(c.last)+'</div>';
-        h+='</div></div></div>';
-    });
-    el.innerHTML=h;
+    const s = i.key || sym;
+    const price = parseFloat(i.last || i.lastPrice || i.p || i.c || 0);
+    if(!price || price <= 0) return;
+
+    let c = mkt[s];
+    if(!c){
+      c = {
+        s: s, b: i.base || s, q: i.quote || 'TRY',
+        n: i.name || s,
+        price: price,
+        open: parseFloat(i.open || price),
+        low: parseFloat(i.low || price),
+        high: parseFloat(i.high || price),
+        vol: parseFloat(i.volume || 0),
+        vb: parseFloat(i.volumeBase || 0),
+        dp: parseFloat(i.dailyPercent || i.priceChangePercent || 0),
+        bid: parseFloat(i.bid || price),
+        ask: parseFloat(i.ask || price),
+        alarm: null,
+        prevPrice: price,
+        hist: [price]
+      };
+      mkt[s] = c;
+    }
+
+    c.prevPrice = c.price;
+    if(price > c.prevPrice) c.flash = 'up';
+    else if(price < c.prevPrice) c.flash = 'down';
+
+    c.price = price;
+    c.open = parseFloat(i.open || c.open);
+    c.high = parseFloat(i.high || c.high);
+    c.low = parseFloat(i.low || c.low);
+    c.bid = parseFloat(i.bid || price);
+    c.ask = parseFloat(i.ask || price);
+    c.vol = parseFloat(i.volume || c.vol);
+    c.vb = parseFloat(i.volumeBase || c.vb);
+    c.dp = parseFloat(i.dailyPercent !== undefined ? i.dailyPercent : c.dp);
+
+    c.hist.push(price);
+    if(c.hist.length > 180) c.hist.shift();
+  });
+
+  market = Object.values(mkt);
+  lastOk = Date.now();
+  setConn(true);
+  renderAll();
 }
 
-function handleRowClick(e, p) { if(e.target.type==='checkbox') return; openDetail(p); }
-function handleCheck(e, p) { if(e.target.checked) selCoins.add(p); else selCoins.delete(p); saveAll(); doRender(); }
-function bulkSel(b) { allCoins.forEach(function(c){ if(b) selCoins.add(c.pair); else selCoins.delete(c.pair); }); saveAll(); doRender(); }
-function resetAll() { localStorage.clear(); selCoins.clear(); priceAlerts={}; stopLosses={}; document.getElementById('globalTarget').value=''; doRender(); }
-function filterList() { doRender(); }
-function handleInput() { savePrefs(); doRender(); }
+// ================= VERİ KAYNAKLARI (otomatik yedekli) =================
+const BT = 'https://api.btcturk.com/api/v2/ticker';
+const BN_SYMS = ['BTCTRY','ETHTRY','BNBTRY','XRPTRY','SOLTRY','ADATRY','DOGETRY','AVAXTRY','USDTTRY','TRXTRY','DOTTRY','LINKTRY','LTCTRY','SHIBTRY','PEPETRY'];
+const BN = 'https://data-api.binance.vision/api/v3/ticker/24hr?symbols=' + encodeURIComponent(JSON.stringify(BN_SYMS));
 
-function updatePnlDrop() {
-    var pnl=document.getElementById('pnlCoin');
-    if(pnl.options.length>1) return; 
-    allCoins.forEach(function(c){
-        var o=document.createElement('option'); o.value=c.pair; o.text=c.pair.replace('TRY',''); pnl.add(o);
-    });
+// type: bt = BtcTurk formatı, bn = Binance formatı
+const SOURCES = [
+  {name:'BtcTurk',          url: BT,                                                         type:'bt'},
+  {name:'BtcTurk (proxy 1)',url:'https://corsproxy.io/?url=' + encodeURIComponent(BT),        type:'bt'},
+  {name:'BtcTurk (proxy 2)',url:'https://api.allorigins.win/raw?url=' + encodeURIComponent(BT),type:'bt'},
+  {name:'BtcTurk (proxy 3)',url:'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(BT), type:'bt'},
+  {name:'Binance (YEDEK - az coin)',   url: BN,                                                         type:'bn'}
+];
+let srcIdx = 0, inFlight = false, failCount = 0, srcName = '';
+
+function normBt(data){
+  const arr = (data && data.data) ? data.data : data;
+  if(!Array.isArray(arr)) throw new Error('beklenmeyen BtcTurk yanıtı');
+  return arr.filter(x => x.pair && x.numeratorSymbol && x.denominatorSymbol).map(x => {
+    const last = parseFloat(x.last), base = x.numeratorSymbol, quote = x.denominatorSymbol;
+    return {
+      pairSymbol: String(x.pair), key: quote === 'TRY' ? base : base + '/' + quote,
+      base: base, quote: quote, name: base,
+      last: last, open: x.open, high: x.high, low: x.low,
+      volumeBase: parseFloat(x.volume) || 0,                 // coin cinsinden (BtcTurk uygulamasındaki gibi)
+      volume: (parseFloat(x.volume) || 0) * (last || 0),
+      dailyPercent: x.dailyPercent, bid: x.bid, ask: x.ask
+    };
+  });
 }
-function calcPnl() {
-    var p=document.getElementById('pnlCoin').value;
-    var amt=parseFloat(document.getElementById('pnlAmt').value||0);
-    var buy=parseFloat(document.getElementById('pnlBuy').value||0);
-    if(!p || !amt || !buy) {
-        document.getElementById('pnlCur').innerText='—';
-        document.getElementById('pnlVal').innerText='Coin seçiniz';
-        document.getElementById('pnlVal').style.color='#fbbf24';
-        document.getElementById('pnlPct').innerText='';
+function normBn(data){
+  if(!Array.isArray(data)) throw new Error('beklenmeyen Binance yanıtı');
+  return data.filter(x => x.symbol && x.symbol.endsWith('TRY')).map(x => {
+    const base = x.symbol.replace(/TRY$/,'');
+    return {
+      pairSymbol: x.symbol, key: base, base: base, quote: 'TRY', name: base,
+      last: x.lastPrice, open: x.openPrice, high: x.highPrice, low: x.lowPrice,
+      volumeBase: x.volume, volume: x.quoteVolume, dailyPercent: x.priceChangePercent, bid: x.bidPrice, ask: x.askPrice
+    };
+  });
+}
+
+async function fetchWithTimeout(url, ms){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const res = await fetch(url, {cache:'no-store', signal: ctl.signal});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } finally { clearTimeout(t); }
+}
+
+async function fetchGlobalPrices(){
+  if(inFlight) return;
+  if(Date.now() - wsLast < 8000) return;   // WebSocket canlıysa REST'e gerek yok
+  inFlight = true;
+  try {
+    for(let k = 0; k < SOURCES.length; k++){
+      const idx = (srcIdx + k) % SOURCES.length;
+      const s = SOURCES[idx];
+      try {
+        const data = await fetchWithTimeout(s.url, 5000);
+        const list = s.type === 'bt' ? normBt(data) : normBn(data);
+        if(!list.length) throw new Error('boş liste');
+        srcIdx = idx; srcName = s.name;   // çalışan kaynağı hatırla
+        failCount = 0;
+        processData(list);
         return;
+      } catch(e){
+        console.warn('[Kaynak hata]', s.name, e.message || e);
+      }
     }
-    var c=allCoins.find(function(x){return x.pair === p;});
-    if(!c) return;
-    document.getElementById('pnlCur').innerText=fmtP(c.last);
-    var curTotal=amt*c.last, buyTotal=amt*buy, diff=curTotal-buyTotal, pct=((c.last-buy)/buy)*100;
-    var elV=document.getElementById('pnlVal'), elP=document.getElementById('pnlPct');
-    elV.innerText=diff.toFixed(2)+' ₺';
-    elP.innerText=(pct>=0?'+':'')+pct.toFixed(2)+'%';
-    if(diff>=0) { elV.style.color='#22c55e'; elP.style.color='#22c55e'; }
-    else { elV.style.color='#ff4757'; elP.style.color='#ff4757'; }
+    failCount++;
+    setConn(false);
+  } finally { inFlight = false; }
 }
 
-function setTop(m) { top5Mode=m; document.getElementById('t5Up').className=m==='up'?'t5btn up':'t5btn'; document.getElementById('t5Dn').className=m==='dn'?'t5btn dn':'t5btn'; renderTop5(); }
-function renderTop5() {
-    var box=document.getElementById('top5Box'); if(!allCoins.length) return;
-    var list=allCoins.slice();
-    if(top5Mode==='up') list.sort(function(a,b){return b.dailyPercent-a.dailyPercent;});
-    else list.sort(function(a,b){return a.dailyPercent-b.dailyPercent;});
-    var h='', t5=list.slice(0,5);
-    t5.forEach(function(c,i){
-        var col=c.dailyPercent>=0?'#22c55e':'#ff4757';
-        h+='<div class="t5row" onclick="openDetail(\''+c.pair+'\')"><span class="t5rk">#'+(i+1)+'</span><span class="t5nm">'+c.pair.replace('TRY','')+'</span><span class="t5pr">'+fmtP(c.last)+'</span><span class="t5ch" style="color:'+col+'; font-weight:bold;">'+(c.dailyPercent>=0?'+':'')+c.dailyPercent.toFixed(2)+'%</span></div>';
+function schedule(){
+  setTimeout(async () => { await fetchGlobalPrices(); schedule(); }, failCount ? 3000 : 1500);
+}
+
+function renderAll(){
+  buildPnlOptions();
+  renderTable();
+  renderRanks();
+  renderSignals();
+  calcPnl();
+  checkAlerts();
+  renderDetail(false);
+}
+
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');},1000);
+document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');
+
+
+// ================= BtcTurk WebSocket (CORS'a takılmaz, TÜM çiftler) =================
+let ws = null, wsLast = 0, wsRetry = 0, wsTimer = null, wsPending = {};
+function normWs(items){
+  const out = [];
+  items.forEach(x => {
+    if(!x || !x.PS || !x.NS || !x.DS) return;
+    const last = parseFloat(x.LA);
+    if(!last) return;
+    out.push({
+      pairSymbol: String(x.PS), key: x.DS === 'TRY' ? x.NS : x.NS + '/' + x.DS,
+      base: x.NS, quote: x.DS, name: x.NS,
+      last: last, open: x.O, high: x.H, low: x.L,
+      volumeBase: parseFloat(x.V) || 0,
+      volume: (parseFloat(x.V) || 0) * last,
+      dailyPercent: x.DP, bid: x.B, ask: x.A
     });
-    box.innerHTML=h;
+  });
+  return out;
 }
-
-function openInfo() { document.getElementById('infoModal').style.display='flex'; }
-function closeInfo() { document.getElementById('infoModal').style.display='none'; }
-function openDetail(p) { activePair=p; document.getElementById('detailModal').style.display='flex'; document.getElementById('aiPredictWindow').style.display='none'; updateDetailUI(); drawSpark(p); }
-function closeDetail() { activePair=null; document.getElementById('detailModal').style.display='none'; }
-
-function openAnalysisModal() {
-    document.getElementById('analysisModal').style.display = 'flex';
-    renderAnalysisContent();
+function wsConnect(){
+  if(ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+  try { ws = new WebSocket('wss://ws-feed-pro.btcturk.com'); }
+  catch(e){ return wsReconnect(); }
+  ws.onopen = () => {
+    ws.send(JSON.stringify([151, {type:151, channel:'ticker', event:'all', join:true}]));
+  };
+  ws.onmessage = ev => {
+    try {
+      const m = JSON.parse(ev.data);
+      const pl = Array.isArray(m) ? m[1] : m;
+      if(!pl) return;
+      const items = Array.isArray(pl.items) ? pl.items : (pl.PS ? [pl] : null);
+      if(!items) return;
+      normWs(items).forEach(t => { wsPending[t.key] = t; });
+      wsLast = Date.now(); wsRetry = 0;
+    } catch(e){}
+  };
+  ws.onerror = () => { try{ws.close();}catch(e){} };
+  ws.onclose = () => wsReconnect();
 }
-function closeAnalysisModal() {
-    document.getElementById('analysisModal').style.display = 'none';
+function wsReconnect(){
+  if(wsTimer) return;
+  wsRetry++;
+  wsTimer = setTimeout(() => { wsTimer = null; wsConnect(); }, Math.min(1000 * wsRetry, 10000));
 }
-function switchAnalysisTab(tab) {
-    currentAnalysisTab = tab;
-    document.getElementById('tabDip').className = tab === 'dip' ? 'an-tab-btn active' : 'an-tab-btn';
-    document.getElementById('tabZirve').className = tab === 'zirve' ? 'an-tab-btn active' : 'an-tab-btn';
-    renderAnalysisContent();
-}
-function renderAnalysisContent() {
-    var container = document.getElementById('analysisList');
-    if (!allCoins.length) {
-        container.innerHTML = '<div style="text-align:center;color:#475569;font-size:0.8rem;padding:20px;">Sinyal veya veri akışı bekleniyor...</div>';
-        return;
-    }
+// 1 saniyede bir toplu işle (ekran donmasın)
+setInterval(() => {
+  const list = Object.values(wsPending);
+  if(!list.length) return;
+  wsPending = {};
+  srcName = 'BtcTurk WebSocket';
+  processData(list);
+}, 1000);
+// 20 sn mesaj gelmezse bağlantıyı yenile
+setInterval(() => {
+  if(ws && ws.readyState === 1 && wsLast && Date.now() - wsLast > 20000){ try{ws.close();}catch(e){} }
+}, 5000);
 
-    var html = '';
-    var matchesCount = 0;
-    var onlySelInAnalysis = document.getElementById('chkAnalysisOnlySel').checked;
+// Çalıştırma ve periyodik güncelleme (istekler üst üste binmez)
+wsConnect();
+fetchGlobalPrices().then(schedule);
 
-    allCoins.forEach(function(c) {
-        if (onlySelInAnalysis && !selCoins.has(c.pair)) {
-            return;
-        }
+// Sekme tekrar görünür olunca / internet gelince hemen yenile
+document.addEventListener('visibilitychange', () => { if(!document.hidden){ wsConnect(); fetchGlobalPrices(); } });
+window.addEventListener('online', () => { wsConnect(); fetchGlobalPrices(); });
 
-        var rsi = calcRSI(c.pair);
-        var mfi = calcMFI(c.pair);
-        var spread = ((c.ask - c.bid) / c.bid * 100);
-        var ma10 = calcMA(c.pair, 10);
-        var isUpTrend = c.dailyPercent >= 0;
+// Kesinti takibi
+setInterval(()=>{
+  if(Date.now() - lastOk > 12000) setConn(false);
+}, 1000);
 
-        var isDipMatch = (rsi <= 35 && mfi <= 30); 
-        var isZirveMatch = (rsi >= 65 && mfi >= 70);
-
-        if ((currentAnalysisTab === 'dip' && isDipMatch) || (currentAnalysisTab === 'zirve' && isZirveMatch)) {
-            matchesCount++;
-
-            var isTrueTrend = false;
-            var verdictText = '';
-            var verdictClass = '';
-
-            if (currentAnalysisTab === 'dip') {
-                if (spread < 0.08 && parseFloat(c.volume) > 50000) {
-                    isTrueTrend = true;
-                    verdictText = "🔍 ANALİZ: GERÇEK DİP/TEPKİ. İndikatörler tamamen boşalmış, derin tahta emirleri ve likidite hacmi bu dönüşü destekliyor. Yapay panik bitmiş olabilir.";
-                    verdictClass = 'true';
-                } else {
-                    verdictText = "⚠️ ANALİZ: ALDATMACA / SAKINCALI. Likidite çok sığ (Spread yüksek veya hacim yetersiz). Yapay olarak aşağı baskılanıyor veya sahte emirlerle sönümleniyor olabilir.";
-                    verdictClass = 'fake';
-                }
-            } else {
-                if (spread < 0.08 && parseFloat(c.volume) > 500000 && ma10 && c.last > ma10) {
-                    isTrueTrend = true;
-                    verdictText = "🔍 ANALİZ: GERÇEK BALON/ZİRVE. Güçlü para girişiyle organik tepeye ulaşmış. Göstergeler aşırı doymuş, kâr realizasyonu dalgası çok yakındır, dikkatli olunmalı.";
-                    verdictClass = 'true';
-                } else {
-                    verdictText = "⚠️ ANALİZ: ALDATMACA / TUZAK. Hacimsiz spekülasyon veya sığ tahtada manipülatif yükseliş. Mal boşaltma (Pump-Dump) tuzağı riski barındırıyor.";
-                    verdictClass = 'fake';
-                }
-            }
-
-            html += `<div class="an-card" onclick="closeAnalysisModal(); openDetail('${c.pair}');">
-                <div class="an-row-top">
-                    <span class="an-coin-name">${c.pair.replace('TRY','')} /TRY</span>
-                    <span class="an-coin-price" style="color: ${isUpTrend?'#22c55e':'#ff4757'}; font-weight:bold;">${fmtP(c.last)} (${isUpTrend?'+':''}${c.dailyPercent.toFixed(2)}%)</span>
-                </div>
-                <div class="an-badge-line">
-                    <span class="an-badge ${currentAnalysisTab === 'dip'?'dip':'zirve'}">${currentAnalysisTab === 'dip'?'DİP BÖLGESİ':'ZİRVE BÖLGESİ'}</span>
-                    <span class="an-badge ind">RSI: ${rsi}</span>
-                    <span class="an-badge ind">MFI: ${mfi}</span>
-                    <span class="an-badge ind">Spread: %${spread.toFixed(3)}</span>
-                </div>
-                <div class="an-verdict ${verdictClass}">${verdictText}</div>
-            </div>`;
-        }
-    });
-
-    if (matchesCount === 0) {
-        var contextMsg = onlySelInAnalysis ? "Seçtiğiniz coinler arasında" : "Tüm piyasada";
-        html = `<div style="text-align:center;color:#94a3b8;font-size:0.8rem;padding:30px;">
-            Şu anda ${contextMsg} kriterlere uygun (${currentAnalysisTab === 'dip' ? 'RSI≤35 & MFI≤30' : 'RSI≥65 & MFI≥70'}) bir veri grubu bulunamadı.
-        </div>`;
-    }
-
-    container.innerHTML = html;
-}
-
-function generateDynamicAnalysis(c, rsi, mfi, spread, ma, speed) {
-    var symbol = c.pair.replace('TRY', '');
-    var change = c.dailyPercent;
-    var text = "📊 <b>" + symbol + " İçin Derin Algoritma Analizi Raporu:</b><br><br>";
-    text += "• <b>Mevcut Trend ve Momentum:</b> Fiyat şu anda " + fmtP(c.last) + " seviyesinde seyrediyor. Günlük değişim grafiği incelendiğinde %" + (change >= 0 ? "+" : "") + change.toFixed(2) + " yönlü bir hareketlilik hakim. ";
-    if (change > 5) {
-        text += "Paritede güçlü bir alıcı dominasyonu (boğa baskısı) var. Fiyat kısa vadeli direnç kanallarını kırarak yukarı yönlü ivmesini dikleştirmiş durumda. Ancak bu dik tırmanışlar kâr realizasyonlarını da tetikleyebilir. ";
-    } else if (change < -5) {
-        text += "Sert bir satıcı baskısı (ayı trendi) yaşanıyor. Fiyat destek seviyelerinin altına sarkar kendi panik satışları derinleşiyor. Alım yönlü aceleci davranmamak, taban oluşumunu beklemek güvenli olabilir. ";
-    } else {
-        text += "Piyasa şu an yatay ve kararsız bir konsolidasyon (akümülasyon) evresinde. Alıcılar ve satıcılar arasında denge var, hacim kırılımı beklenmeli. ";
-    }
-    text += "<br><br>• <b>İndikatör Kombinasyon Analizi:</b> Anlık RSI değeri <b>" + rsi + "</b> ve Para Akışı İndeksi (MFI) <b>" + mfi + "</b> olarak ölçüldü. ";
-    if (rsi >= 70 || mfi >= 75) {
-        text += "RSI ve MFI verilerinin her ikisi de aşırı alım (tepe) bölgesine ulaşıldığını tescilliyor. Piyasaya giren para doygunluk noktasına yaklaşmış. Teknik olarak bu durum, coinin 'pahalı' aşamada olduğuna ve yakın süreçte sert bir düzeltme (düşüş) eğiliminin baş gösterme ihtimalinin yüksek olduğuna işaret eder. ";
-    } else if (rsi <= 30 || mfi <= 25) {
-        text += "İndikatörler aşırı satış (dip) bölgesinde alarm veriyor. Hacimsiz düşüş dalgası pariteyi matematiksel olarak aşırı iskonto moduna sokmuş. RSI and MFI'ın bu seviyelerden yukarı dönecek ilk hamlesi, teknik bir tepki yükselişini tetikleyebilir. ";
-    } else {
-        text += "Hem RSI ve MFI dengeli nötr bölgede (30-70 arası) hareket ediyor. Bu, yapay bir spekülasyon olmadığını, fiyat hareketinin hacimle uyumlu ve organik ilerlediğini gösterir. ";
-    }
-    text += "<br><br>• <b>Piyasa Yapısı ve Likidite:</b> 10 periyotluk hareketli ortalama (MA10) " + (ma ? fmtP(ma) : "Hesaplanıyor") + " seviyesinde. Fiyat şu an " + (ma && c.last > ma ? "bu ortalamanın üzerinde kalarak yönünü yukarı koruyor." : "bu ortalamanın altında baskılanarak zayıf bir duruş sergiliyor.");
-    text += " Tahtadaki alış/satış makası (Spread) <b>%" + spread.toFixed(4) + "</b> seviyesinde. ";
-    if (spread > 0.1) {
-        text += "Spread oranının yüksek olması likiditenin sığ olduğunu gösteriyor. Limit emir kullanmak riskleri azaltacaktır. ";
-    } else {
-        text += "Dar spread yapısı derin bir emir defterine ve yüksek likiditeye işaret ediyor. Anlık alım-satım işlemlerinde fiyat kayması minimum düzeyde kalacaktır. ";
-    }
-    text += "<br><br>• <b>Stratejik Değerlendirme Notu:</b> Anlık fiyat oynaklık hızı <b>" + speed + "</b> olarak kaydedildi. ";
-    if (change > 0 && rsi < 65) {
-        text += "Yükseliş trendi henüz şişmediği için alan hala açık görünüyor; trend takibi yapılabilir. ";
-    } else if (change < 0 && rsi > 35) {
-        text += "Düşüş eğilimi devam ediyor, net bir dönüş sinyali görülmeden işleme dahil olmak risk barındırabilir. ";
-    } else {
-        text += "Mevcut teknik parametreler doğrultusunda aşağıda destek seviyelerine yakın stop-loss kullanımı, yukarıda ise direnç bölgelerinde kademeli kâr alımı rasyonel bir ticaret stratejisi olacaktır.";
-    }
-    return text;
-}
-
-function generateFuture10MinPrediction() {
-    var c = allCoins.find(function(x){return x.pair === activePair;});
-    if (!c) return;
-
-    var rsi = calcRSI(c.pair);
-    var mfi = calcMFI(c.pair);
-    var spread = ((c.ask - c.bid) / c.bid * 100);
-    var ma = calcMA(c.pair, 10) || c.last;
-    var speed = calcSpeed(c.pair);
-    var change = c.dailyPercent;
-    var coinName = c.pair.replace('TRY', '');
-
-    var hist = changeHistory[c.pair];
-    var oneHourDelta = 0;
-    if (hist && hist.length > 0) {
-        oneHourDelta = change - hist[0].v;
-    }
-
-    var volumeStatus = "Nötr Akış";
-    var volumeColor = "#e2e8f0";
-    if (parseFloat(c.volume) > 1000000 && oneHourDelta > 0) {
-        volumeStatus = "Güçlü Giriş (+)";
-        volumeColor = "#22c55e";
-    } else if (oneHourDelta < -1) {
-        volumeStatus = "Hacimli Çıkış (-)";
-        volumeColor = "#ff4757";
-    } else if (spread > 0.08) {
-        volumeStatus = "Sığ / Kararsız";
-        volumeColor = "#fbbf24";
-    }
-
-    var topStatus = "Uzak / Taban";
-    var topColor = "#22c55e";
-    if (rsi >= 75 || mfi >= 75) {
-        topStatus = "ZİRVEDE (Doymuş)";
-        topColor = "#ff4757";
-    } else if (rsi >= 60 || mfi >= 60) {
-        topStatus = "Zirveye Yakın";
-        topColor = "#fbbf24";
-    }
-
-    var reverseStatus = "Yatay İzleme";
-    var reverseColor = "#cbd5e1";
-    if (topStatus.includes("ZİRVEDE") && c.last < ma && speed.includes("HIZLI")) {
-        reverseStatus = "Düşüş Başladı 📉";
-        reverseColor = "#ff4757";
-    } else if (rsi < 30 && c.last > ma) {
-        reverseStatus = "Dip Dönüşü Başladı 📈";
-        reverseColor = "#22c55e";
-    } else if (change > 3 && speed.includes("HIZLI")) {
-        reverseStatus = "Yukarı Momentum";
-        reverseColor = "#22c55e";
-    }
-
-    var volatilityMultiplier = 0.003; 
-    if (speed.includes("HIZLI")) volatilityMultiplier = 0.007; 
-    
-    var expectedChange = 0;
-    if (reverseStatus.includes("Düşüş")) expectedChange = -0.004;
-    else if (reverseStatus.includes("Dönüşü Başladı") || reverseStatus.includes("Momentum")) expectedChange = 0.005;
-    else if (volumeStatus.includes("Giriş")) expectedChange = 0.002;
-
-    var midEstimatedPrice = c.last * (1 + expectedChange);
-    var lowRange = midEstimatedPrice * (1 - volatilityMultiplier);
-    var highRange = midEstimatedPrice * (1 + volatilityMultiplier);
-
-    var report = "🔮 <b>" + coinName + " Önümüzdeki 10 Dakikalık Projeksiyon Raporu:</b><br><br>";
-    report += "Son 1 saatlik veri mimarisi tarandığında net değişim trendinin <b>%" + (oneHourDelta >= 0 ? "+" : "") + oneHourDelta.toFixed(2) + "</b> olduğu tespit edildi. ";
-    
-    if (volumeStatus.includes("Giriş")) {
-        report += "Tahtaya son 1 saat içerisinde kurumsal/büyük hacimli <b>para girişleri</b> gerçekleşmiş. Bu durum, emir defterindeki blok satışlerin eritilmesini kolaylaştırıyor. ";
-    } else if (volumeStatus.includes("Çıkış")) {
-        report += "Son 1 saatlik periyotta panik satışları ve <b>para çıkışları</b> ağırlıkta. Alıcı kademeleri aşağı çekiliyor. ";
-    } else {
-        report += "Giriş ve çıkışlar mikro dengede akümüle oluyor, ani kırılım tahta derinliğine bağlı. ";
-    }
-
-    report += "<br><br><b>Zirve ve Dönüş Kontrolü:</b> ";
-    if (rsi >= 75) {
-        report += "Coin matematiksel zirvesini <b>tamamlamış</b> ve aşırı doygunluk fazına geçmiş. Son dakikalardaki hareket hızı incelendiğinde <b>" + reverseStatus + "</b> teyit ediliyor. Teknik düzeltme dalgası sertleşebilir. ";
-    } else if (rsi <= 28) {
-        report += "Parite son 1 saattir ezilerek dip noktasına ulaşmış. Satıcılar gücünü yitirmek üzere. Anlık tahmin mekanizmaları bir <b>" + reverseStatus + "</b> sinyali üretiyor. ";
-    } else {
-        report += "Mevcut fiyat ne tam bir zirvede ne de tam bir dipte. Ara istasyonda hareket ediyor. Geri dönüş baskısı henüz tetiklenmemiş, mevcut trend korunuyor. ";
-    }
-
-    report += "<br><br>🎯 <b>Gelecek 10 Dakika Öngörüsü:</b> Yapay zeka simülasyonu, mevcut sığlık makasını (Spread: %" + spread.toFixed(3) + ") ve anlık ivmeyi hesaplayarak önümüzdeki 10 dakika boyunca fiyatın <b>" + fmtP(lowRange) + "</b> ile <b>" + fmtP(highRange) + "</b> koridorunda fiyatlanma olasılığını yüksek görüyor.";
-
-    document.getElementById('aiMVolume').innerText = volumeStatus;
-    document.getElementById('aiMVolume').style.color = volumeColor;
-    document.getElementById('aiMTop').innerText = topStatus;
-    document.getElementById('aiMTop').style.color = topColor;
-    document.getElementById('aiMReverse').innerText = reverseStatus;
-    document.getElementById('aiMReverse').style.color = reverseColor;
-    document.getElementById('aiMTarget').innerText = fmtP(midEstimatedPrice);
-    
-    document.getElementById('aiPredictReport').innerHTML = report;
-    document.getElementById('aiPredictWindow').style.display = 'block';
-}
-
-function updateDetailUI() {
-    var c=allCoins.find(function(x){return x.pair===activePair;}); if(!c) return;
-    var rsi = calcRSI(c.pair);
-    var mfi = calcMFI(c.pair);
-    var spread = ((c.ask-c.bid)/c.bid*100);
-    var ma = calcMA(c.pair,10);
-    var speed = calcSpeed(c.pair);
-
-    document.getElementById('dtTitle').innerText=c.pair.replace('TRY','') + ' DETAY ANALİZİ';
-    document.getElementById('dtLast').innerText=fmtP(c.last);
-    document.getElementById('dtBid').innerText=fmtP(c.bid);
-    document.getElementById('dtAsk').innerText=fmtP(c.ask);
-    document.getElementById('dtHigh').innerText=fmtP(c.high);
-    document.getElementById('dtLow').innerText=fmtP(c.low);
-    document.getElementById('dtSpread').innerText=spread.toFixed(4)+'%';
-    document.getElementById('dtBAsk').innerText=parseFloat(c.askVolume).toFixed(2);
-    document.getElementById('dtBBid').innerText=parseFloat(c.bidVolume).toFixed(2);
-    
-    var m=calcMetrics(c);
-    document.getElementById('dtTrend').innerText=m.trend;
-    document.getElementById('dtVolS').innerText=m.volS;
-    document.getElementById('dtRSI').innerText=rsi;
-    document.getElementById('dtMFI').innerText=mfi;
-    document.getElementById('dtMA').innerText=ma?fmtP(ma):'Hesaplanıyor...';
-    document.getElementById('dtSpeed').innerText=speed;
-    document.getElementById('dtCorr').innerText=calcCorr(c.pair);
-    document.getElementById('dtHist').innerText=calcHistSummary(c.pair);
-    
-    document.getElementById('palInput').value=priceAlerts[c.pair]||'';
-    document.getElementById('slInput').value=stopLosses[c.pair]?(((c.last-stopLosses[c.pair])/c.last)*100).toFixed(1):'';
-    
-    document.getElementById('dtAI').innerHTML = generateDynamicAnalysis(c, rsi, mfi, spread, ma, speed);
-}
-
-function setPriceAlert() { var v=parseFloat(document.getElementById('palInput').value); if(v>0){ priceAlerts[activePair]=v; firedPrice[activePair]=false; } else { delete priceAlerts[activePair]; } saveAll(); }
-function clearPriceAlert() { document.getElementById('palInput').value=''; delete priceAlerts[activePair]; saveAll(); }
-function setStopLoss() { var v=parseFloat(document.getElementById('slInput').value); var c=allCoins.find(function(x){return x.pair===activePair;}); if(v>0&&c){ stopLosses[activePair]=c.last*(1-(v/100)); firedSL[activePair]=false; } else { delete stopLosses[activePair]; } saveAll(); }
-function clearStopLoss() { document.getElementById('slInput').value=''; delete stopLosses[activePair]; saveAll(); }
-
-function drawSpark(pair) {
-    var canvas=document.getElementById('dtSpark'), ctx=canvas.getContext('2d');
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    var h=priceHistory[pair]; if(!h||h.length<2) return;
-    var min=Math.min.apply(null,h), max=Math.max.apply(null,h), rng=max-min||1;
-    ctx.beginPath(); ctx.strokeStyle='#38ef7d'; ctx.lineWidth=2;
-    h.forEach(function(v,i){
-        var x=(i/(h.length-1))*canvas.width;
-        var y=canvas.height-((v-min)/rng)*canvas.height;
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-}
-
-(function initResizableList() {
-    var bar = document.getElementById('resizeBar');
-    var list = document.getElementById('coinList');
-    var startY, startHeight;
-    var originalHeight = 400; 
-
-    function startDrag(e) {
-        startY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-        startHeight = parseInt(document.defaultView.getComputedStyle(list).maxHeight, 10);
-        
-        if (e.touches) {
-            document.addEventListener('touchmove', doDrag, { passive: false });
-            document.addEventListener('touchend', stopDrag);
-        } else {
-            document.addEventListener('mousemove', doDrag);
-            document.addEventListener('mouseup', stopDrag);
-        }
-    }
-
-    function doDrag(e) {
-        var currentY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-        var newHeight = startHeight - (currentY - startY);
-        
-        // iOS WebKit kilitlenmesini engellemek için tarayıcı viewport hesabı yerine sabit mobil üst sınır (600px) getirildi
-        if (newHeight > 600) {
-            list.style.maxHeight = "600px"; 
-        } else if (newHeight < 200) {
-            list.style.maxHeight = "200px";
-        } else {
-            list.style.maxHeight = newHeight + "px";
-        }
-    }
-
-    function stopDrag() {
-        document.removeEventListener('mousemove', doDrag);
-        document.removeEventListener('mouseup', stopDrag);
-        document.removeEventListener('touchmove', doDrag);
-        document.removeEventListener('touchend', stopDrag);
-    }
-
-    bar.addEventListener('mousedown', startDrag);
-    bar.addEventListener('touchstart', startDrag, { passive: true });
-})();
-
-loadAll();
-fetchPrices();
-setInterval(fetchPrices, 3000);
+// Sekmeler (Tümü / TRY / USDT / Favoriler)
+['All','TRY','USDT','Fav'].forEach(n=>{
+  document.getElementById('tab'+n).onclick=()=>{
+    tab = n==='All' ? 'all' : n==='Fav' ? 'fav' : n;
+    ['All','TRY','USDT','Fav'].forEach(m=>document.getElementById('tab'+m).classList.toggle('on',m===n));
+    renderTable();
+  };
+});
 </script>
 </body>
 </html>
