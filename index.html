@@ -189,8 +189,8 @@ tbody tr:hover{background:var(--panel2)}
       <label class="fl">Coin Seç</label>
       <select id="pnlCoin"><option value="">— Coin seç —</option></select>
       <div class="row2" style="margin-top:8px">
-        <div><label class="fl">Miktar (adet)</label><input type="number" id="pnlAmt" placeholder="0"></div>
-        <div><label class="fl">Alış Fiyatı</label><input type="number" id="pnlBuy" placeholder="0.00"></div>
+        <div><label class="fl">Miktar (adet)</label><input type="text" inputmode="decimal" id="pnlAmt" placeholder="0"></div>
+        <div><label class="fl">Alış Fiyatı</label><input type="text" inputmode="decimal" id="pnlBuy" placeholder="0,00"></div>
       </div>
       <div class="pnlout">
         <div><div class="lbl">Anlık Fiyat</div><div class="cur" id="pnlCur">—</div></div>
@@ -205,7 +205,7 @@ tbody tr:hover{background:var(--panel2)}
     <div class="card">
       <div class="ctitle">⚡ Değişim Uyarıları <span class="cnt" id="alCnt">0</span></div>
       <label class="fl">Eşik (%) — bu orandan fazla oynayan coin bildirilir</label>
-      <input type="number" id="alThr" value="1" step="0.5">
+      <input type="text" inputmode="decimal" id="alThr" value="1">
       <div class="scroll" id="alLog" style="margin-top:10px"><div class="muted">Anlık değişimler burada listelenir...</div></div>
       <button class="clrbtn" id="alClear" style="margin-top:8px">Temizle</button>
     </div>
@@ -232,6 +232,11 @@ let mkt={};
 let market=[];   
 let lastOk = Date.now();
 
+function parseNum(t){
+  t = String(t == null ? '' : t).trim().replace(/\s/g,'');
+  if(t.indexOf(',') > -1 && t.indexOf('.') > -1) t = t.replace(/\./g,'');   // 1.234,56 -> 1234,56
+  return parseFloat(t.replace(',', '.'));
+}
 function fmtVol(v){
   v = Number(v) || 0;
   return v.toLocaleString('tr-TR', {maximumFractionDigits: v >= 1000 ? 0 : 4});
@@ -399,8 +404,8 @@ function calcPnl(){
   const cur=document.getElementById('pnlCur'),val=document.getElementById('pnlVal'),pct=document.getElementById('pnlPct'),sub=document.getElementById('pnlSub');
   if(!c){cur.textContent='—';val.textContent='Coin seçiniz';val.className='val y';pct.textContent='';sub.textContent='';return;}
   cur.textContent=fmtRaw(c.price)+' '+c.q;
-  const amt=parseFloat(document.getElementById('pnlAmt').value)||0;
-  const buy=parseFloat(document.getElementById('pnlBuy').value)||0;
+  const amt=parseNum(document.getElementById('pnlAmt').value)||0;
+  const buy=parseNum(document.getElementById('pnlBuy').value)||0;
   if(amt<=0||buy<=0){val.textContent='Miktar & alış gir';val.className='val y';pct.textContent='';sub.textContent='';return;}
   const diff=(c.price-buy)*amt,p=(c.price-buy)/buy*100,up=diff>=0;
   val.textContent=(up?'+':'')+fmtMoney(diff)+' '+c.q;val.className='val '+(up?'g':'r');
@@ -408,20 +413,80 @@ function calcPnl(){
   sub.textContent='Maliyet '+fmtMoney(buy*amt)+' → Güncel '+fmtMoney(c.price*amt)+' '+c.q;
 }
 
-function toast(kind,title,body){
+let alarmStore = {};
+try { alarmStore = JSON.parse(localStorage.getItem('btc_alarms') || '{}') || {}; } catch(e){}
+function persistAlarms(){ try { localStorage.setItem('btc_alarms', JSON.stringify(alarmStore)); } catch(e){} }
+let actx = null, wavUrl = null, beepStop = false;
+function unlockAudio(){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if(actx.state === 'suspended') actx.resume();
+  } catch(e){}
+}
+['pointerdown','touchstart','click','keydown'].forEach(ev => document.addEventListener(ev, unlockAudio, {passive:true}));
+
+function makeWav(){
+  const sr = 22050, n = Math.floor(sr * 0.22);
+  const buf = new ArrayBuffer(44 + n*2), v = new DataView(buf);
+  const w = (o,t) => { for(let i=0;i<t.length;i++) v.setUint8(o+i, t.charCodeAt(i)); };
+  w(0,'RIFF'); v.setUint32(4,36+n*2,true); w(8,'WAVE'); w(12,'fmt ');
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true);
+  w(36,'data'); v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){
+    const env = Math.min(1, i/200, (n-i)/400);
+    v.setInt16(44+i*2, Math.sin(2*Math.PI*1000*i/sr) * 0.7 * env * 32767, true);
+  }
+  return URL.createObjectURL(new Blob([buf], {type:'audio/wav'}));
+}
+function beepOnce(){
+  let ok = false;
+  try {
+    if(actx && actx.state === 'running'){
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'square'; o.frequency.value = 1000;
+      g.gain.setValueAtTime(0.0001, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.35, actx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.22);
+      o.connect(g); g.connect(actx.destination);
+      o.start(); o.stop(actx.currentTime + 0.25);
+      ok = true;
+    }
+  } catch(e){}
+  if(!ok){
+    try { wavUrl = wavUrl || makeWav(); const a = new Audio(wavUrl); a.volume = 1; a.play().catch(()=>{}); } catch(e){}
+  }
+}
+// "bip bip bip" — 8 tur tekrar eder, alarm kutusuna dokununca durur
+function beep(){
+  beepStop = false;
+  let k = 0;
+  const run = () => {
+    if(beepStop || k >= 8) return;
+    beepOnce(); setTimeout(beepOnce, 300); setTimeout(beepOnce, 600);
+    try { if(navigator.vibrate) navigator.vibrate([200,100,200,100,200]); } catch(e){}
+    k++; setTimeout(run, 1500);
+  };
+  run();
+}
+function toast(kind,title,body,sticky){
   const w=document.getElementById('toastWrap');
   const d=document.createElement('div');d.className='toast '+kind;
   d.innerHTML=`<div class="th"><span>${title}</span></div><div class="tbd">${body}</div>`;
-  d.onclick=()=>d.remove();
+  d.onclick=()=>{d.remove(); if(sticky) beepStop=true;};
   w.appendChild(d);
-  setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400);},6000);
-  while(w.children.length>5)w.removeChild(w.firstChild);
+  setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400);}, sticky ? 60000 : 6000);
+  while(w.children.length>5){
+    const x = Array.from(w.children).find(e => !e.classList.contains('alarm')) || w.firstChild;
+    w.removeChild(x);
+  }
 }
 
 function checkAlerts(){
-  const thr=Math.abs(parseFloat(document.getElementById('alThr').value)||1);
+  const thr=Math.abs(parseNum(document.getElementById('alThr').value)||1);
   market.forEach(c=>{
-    if(c.hist.length>=2){
+    if(c.hist.length>=2 && c.apid!==c.pid){
+      c.apid=c.pid;
       const prev=c.hist[c.hist.length-2],d=(c.price-prev)/prev*100;
       if(Math.abs(d)>=thr){
         const up=d>=0;
@@ -433,8 +498,12 @@ function checkAlerts(){
     if(c.alarm){
       const a=c.alarm;
       if((a.dir==='up'&&c.price>=a.price)||(a.dir==='down'&&c.price<=a.price)){
-        toast('alarm','🔔 '+c.s+' Alarmı',`Fiyat ${a.dir==='up'?'≥':'≤'} ${fmtRaw(a.price)} ${c.q} oldu · şu an ${fmtRaw(c.price)}`);
-        c.alarm=null;
+        const msg = `Fiyat ${a.dir==='up'?'≥':'≤'} ${fmtRaw(a.price)} ${c.q} oldu · şu an ${fmtRaw(c.price)}`;
+        toast('alarm','🔔 '+c.b+'/'+c.q+' Alarmı',msg,true);
+        beep();
+        try { if('Notification' in window && Notification.permission === 'granted') new Notification('🔔 '+c.b+'/'+c.q, {body: msg}); } catch(e){}
+        c.alarm=null; delete alarmStore[c.s]; persistAlarms();
+        updateAlarmInfo(c);
       }
     }
   });
@@ -445,8 +514,27 @@ function checkAlerts(){
 }
 
 let detailSym=null;
-function openDetail(sym){detailSym=sym;renderDetail(true);}
+function openDetail(sym){detailSym=sym;renderDetail(true);const c=market.find(x=>x.s===sym);if(c)seedChart(c);}
 function closeDetail(){detailSym=null;document.getElementById('modalHost').innerHTML='';}
+function chartData(c){
+  const live = c.hist.slice(-90);
+  return c.seed && c.seed.length ? c.seed.slice(-120).concat(live) : c.hist;
+}
+async function seedChart(c){
+  if(c.seedTried || !c.ps) return;
+  c.seedTried = true;
+  const to = Math.floor(Date.now()/1000), from = to - 3*3600;
+  const u = `https://graph-api.btcturk.com/v1/klines/history?symbol=${c.ps}&resolution=1&from=${from}&to=${to}`;
+  const urls = [u, 'https://corsproxy.io/?url=' + encodeURIComponent(u), 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u)];
+  for(const url of urls){
+    try {
+      const d = await fetchWithTimeout(url, 5000);
+      const cl = (d && (d.c || (d.data && d.data.c))) || [];
+      const arr = cl.map(Number).filter(x => x > 0);
+      if(arr.length > 5){ c.seed = arr; renderDetail(false); return; }
+    } catch(e){}
+  }
+}
 function renderDetail(rebuild){
   if(!detailSym)return;
   const c=market.find(x=>x.s===detailSym);if(!c)return;
@@ -456,7 +544,7 @@ function renderDetail(rebuild){
     host.innerHTML=`<div class="modal" id="dmodal"><div class="mcard">
       <div class="mhead"><div class="mtit"><span class="ico">${c.s[0]}</span><div><b>${c.b}/${c.q}</b><div class="nm">${c.n}</div></div></div><span class="close" id="dx">✕</span></div>
       <div class="mprice"><div class="big" id="dBig"></div><div class="chg" id="dChg" style="font-size:16px"></div></div>
-      <div class="mchart"><div class="ct"><span>Canlı Grafik (son fiyatlar)</span><span id="dRange"></span><span class="lv" id="dLv"></span></div><div id="dChart"></div></div>
+      <div class="mchart"><div class="ct"><span>Canlı Grafik (son saatler + anlık)</span><span id="dRange"></span><span class="lv" id="dLv"></span></div><div id="dChart"></div></div>
       <div class="mgrid">
         <div class="mi"><span>En İyi Alış</span><b class="g" id="dBid"></b></div>
         <div class="mi"><span>En İyi Satış</span><b class="r" id="dAsk"></b></div>
@@ -467,16 +555,22 @@ function renderDetail(rebuild){
         <div class="mi"><span>24s Hacim (${c.q})</span><b id="dVolQ"></b></div>
       </div>
       <div class="mhd">🔔 Fiyat Alarmı Kur</div>
-      <div class="alarmbox"><input type="number" id="dAlarm" placeholder="Hedef fiyat (${c.q})"><button id="dAlarmBtn">Alarm Kur</button></div>
+      <div class="alarmbox"><input type="text" inputmode="decimal" id="dAlarm" placeholder="Hedef fiyat (${c.q})"><button id="dAlarmBtn">Alarm Kur</button></div>
+      <div style="margin:-6px 0 8px"><a href="#" id="dBeepTest" style="color:var(--yellow);font-size:12px">🔊 Sesi dene</a></div>
       <div id="dAlarmInfo" style="font-size:12px;color:var(--sub);margin-bottom:12px"></div>
       <div class="mbtns"><button class="tbtn g big2">Al</button><button class="tbtn r big2">Sat</button></div>
     </div></div>`;
     document.getElementById('dmodal').onclick=e=>{if(e.target.id==='dmodal')closeDetail();};
     document.getElementById('dx').onclick=closeDetail;
+    document.getElementById('dBeepTest').onclick=e=>{e.preventDefault();unlockAudio();beepOnce();setTimeout(beepOnce,300);setTimeout(beepOnce,600);};
     document.getElementById('dAlarmBtn').onclick=()=>{
-      const v=parseFloat(document.getElementById('dAlarm').value);
-      if(!v||v<=0){document.getElementById('dAlarmInfo').textContent='Geçerli bir fiyat girin.';return;}
+      unlockAudio();
+      try{ if('Notification' in window && Notification.permission==='default') Notification.requestPermission(); }catch(e){}
+      const v=parseNum(document.getElementById('dAlarm').value);
+      if(!v||v<=0){document.getElementById('dAlarmInfo').textContent='Geçerli bir fiyat girin (örn: 0,0450).';return;}
       c.alarm={price:v,dir:v>=c.price?'up':'down'};
+      alarmStore[c.s]=c.alarm; persistAlarms();
+      document.getElementById('dAlarm').value='';
       renderTable();updateAlarmInfo(c);
     };
   }
@@ -493,12 +587,17 @@ function renderDetail(rebuild){
   g('dVol').textContent=fmtVol(c.vb);
   g('dVolQ').textContent=fmtVol(c.vol);
   
-  const ce=g('dChart');if(ce)ce.innerHTML=bigChart(c.hist,up);
-  const rg=g('dRange');if(rg&&c.hist.length>1)rg.textContent='Min '+fmtRaw(Math.min(...c.hist))+' · Maks '+fmtRaw(Math.max(...c.hist))+'  ';
+  const ce=g('dChart');if(ce)ce.innerHTML=bigChart(chartData(c),up);
+  const rg=g('dRange');if(rg&&chartData(c).length>1){const cd=chartData(c);rg.textContent='Min '+fmtRaw(Math.min(...cd))+' · Maks '+fmtRaw(Math.max(...cd))+'  ';}
   const lv=g('dLv');if(lv){lv.textContent=fmtRaw(c.price)+' '+c.q;lv.style.color=up?'var(--green)':'var(--red)';}
   updateAlarmInfo(c);
 }
-function updateAlarmInfo(c){const el=document.getElementById('dAlarmInfo');if(!el)return;el.innerHTML=c.alarm?`Aktif alarm: fiyat <b class="y">${c.alarm.dir==='up'?'≥':'≤'} ${fmtRaw(c.alarm.price)} ${c.q}</b> olunca bildirilecek.`:'Henüz alarm yok.';}
+function updateAlarmInfo(c){
+  const el=document.getElementById('dAlarmInfo');if(!el)return;
+  el.innerHTML=c.alarm?`✅ Alarm kuruldu: fiyat <b class="y">${c.alarm.dir==='up'?'≥':'≤'} ${fmtRaw(c.alarm.price)} ${c.q}</b> olunca ses + titreşim + bildirim. <a href="#" id="dAlarmDel" style="color:var(--red)">İptal</a><br><span style="font-size:11px">Not: Sayfa açık kalmalı; telefon kilitlenirse tarayıcı alarmı çalıştıramaz.</span>`:'Henüz alarm yok.';
+  const del=document.getElementById('dAlarmDel');
+  if(del)del.onclick=e=>{e.preventDefault();c.alarm=null;delete alarmStore[c.s];persistAlarms();renderTable();updateAlarmInfo(c);};
+}
 
 document.getElementById('q').oninput=e=>{search=e.target.value;document.getElementById('qClear').classList.toggle('show',!!search);renderTable();};
 document.getElementById('qClear').onclick=()=>{search='';const q=document.getElementById('q');q.value='';document.getElementById('qClear').classList.remove('show');renderTable();q.focus();};
@@ -547,7 +646,8 @@ function processData(list){
         dp: parseFloat(i.dailyPercent || i.priceChangePercent || 0),
         bid: parseFloat(i.bid || price),
         ask: parseFloat(i.ask || price),
-        alarm: null,
+        alarm: alarmStore[s] || null,
+        ps: i.pairSymbol || '', seed: null, seedTried: false, pid: 0, apid: 0, lastPush: 0,
         prevPrice: price,
         hist: [price]
       };
@@ -568,8 +668,11 @@ function processData(list){
     c.vb = parseFloat(i.volumeBase || c.vb);
     c.dp = parseFloat(i.dailyPercent !== undefined ? i.dailyPercent : c.dp);
 
-    c.hist.push(price);
-    if(c.hist.length > 180) c.hist.shift();
+    const nowT = Date.now();
+    if(price !== c.hist[c.hist.length-1] || nowT - c.lastPush > 5000){
+      c.hist.push(price); c.pid++; c.lastPush = nowT;
+      if(c.hist.length > 180) c.hist.shift();
+    }
   });
 
   market = Object.values(mkt);
