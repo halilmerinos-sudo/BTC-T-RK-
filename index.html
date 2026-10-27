@@ -329,6 +329,28 @@ tbody td{white-space:nowrap}
 @keyframes tkBgR{0%,30%{background:rgba(246,70,93,.75)}100%{background:transparent}}
 @keyframes tkTxG{0%,30%{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.8)}}
 @keyframes tkTxR{0%,30%{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.8)}}
+
+/* ===== Grafik: gezinince saat + fiyat ===== */
+.cwrap{touch-action:pan-y;cursor:crosshair;position:relative}
+.cline{position:absolute;top:0;bottom:0;width:1px;background:var(--sub);display:none;pointer-events:none}
+.chdot{position:absolute;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:#fff;border:2px solid var(--dotc,var(--green));display:none;pointer-events:none}
+.ctip{position:absolute;top:2px;display:none;pointer-events:none;background:rgba(10,12,15,.95);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:6;font-variant-numeric:tabular-nums;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.ctip .ctm{color:var(--yellow);font-weight:700}
+.caxis{display:flex;justify-content:space-between;font-size:10.5px;color:var(--sub);margin-top:3px;font-variant-numeric:tabular-nums}
+.chint{font-size:10.5px;color:var(--sub);margin-top:2px;text-align:center}
+
+/* ===== Sanal hesap ===== */
+.infobar{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.trow{display:grid;grid-template-columns:1.1fr 1fr 1.3fr 1fr;gap:6px;padding:7px 10px;background:var(--panel2);border-radius:8px;margin-bottom:5px;font-size:12.5px;align-items:center}
+.trow.th{background:transparent;color:var(--sub);font-size:11px;font-weight:700;padding-bottom:2px}
+.trow span{min-width:0;overflow-wrap:anywhere}
+.tbtn small{display:block;font-size:11px;font-weight:600;opacity:.9;font-variant-numeric:tabular-nums}
+#orderModal .mi b{font-size:14px}
+@media(max-width:700px){
+  .infobar .ibtn:last-child:nth-child(odd){grid-column:1/-1}
+  .trow{grid-template-columns:1fr 1fr;font-size:12px}
+  .trow.th{display:none}
+}
 </style>
 </head>
 <body>
@@ -370,6 +392,7 @@ tbody td{white-space:nowrap}
       <button class="ibtn" data-p="rank"><span class="ibt">🏆 Canlı Sıralama</span><span class="ibd">En çok yükselen ve düşen coinler</span></button>
       <button class="ibtn" data-p="log"><span class="ibc" id="ibLog">0</span><span class="ibt">⚡ Değişim Uyarıları</span><span class="ibd">Ani fiyat hareketlerinin kaydı</span></button>
       <button class="ibtn" data-p="sig"><span class="ibc" id="ibSig">0</span><span class="ibt">📡 Teknik Sinyaller</span><span class="ibd">RSI: aşırı alım / aşırı satım</span></button>
+      <button class="ibtn" data-p="sim"><span class="ibt">🧾 Sanal Hesap & Rapor</span><span class="ibd">Al/Sat denemesi ve performans raporu</span></button>
     </div>
 
     <div class="card infopanel" data-panel="big" style="grid-column:1/-1;display:none">
@@ -388,6 +411,10 @@ tbody td{white-space:nowrap}
       <input type="text" inputmode="decimal" id="alThr" value="1"></div>
       <div id="alLog" class="glist"><div class="muted">Anlık değişimler burada listelenir...</div></div>
       <button class="clrbtn" id="alClear" style="margin-top:10px">Listeyi temizle</button>
+    </div>
+    <div class="card infopanel" data-panel="sim" style="grid-column:1/-1;display:none">
+      <div class="iph"><div><div class="ipt">🧾 Sanal Hesap & Rapor</div><div class="idesc">Gerçek para kullanılmayan deneme hesabı. Coin detay penceresindeki <b>Al</b> ve <b>Sat</b> düğmeleri canlı alış/satış fiyatıyla sanal işlem yapar, komisyon düşülür. Pozisyonlar <b>Takibim</b>'de izlenir ve zarar eşiğinde uyarı verir. Aşağıda hesabın performans raporu yer alır.</div></div><button class="clrbtn" data-close>✕ Kapat</button></div>
+      <div id="simBox"></div>
     </div>
     <div class="card infopanel" data-panel="sig" style="grid-column:1/-1;display:none">
       <div class="iph"><div><div class="ipt">📡 Teknik Sinyaller (RSI) <span class="cnt" id="sgCnt">0</span></div><div class="idesc">RSI, fiyatın kısa sürede aşırı yükselip yükselmediğini ölçer. <b class="r">70 ve üstü: aşırı alım</b> (düşüş riski artar), <b class="g">30 ve altı: aşırı satım</b> (tepki ihtimali artar). Sayfa açıkken toplanan canlı fiyatlardan hesaplanır, kesin sinyal değildir.</div></div><button class="clrbtn" data-close>✕ Kapat</button></div>
@@ -420,6 +447,7 @@ function parseNum(t){
   const nd = (t.match(/\./g) || []).length, nc = (t.match(/,/g) || []).length;
   if(nc > 0 && nd > 0) t = t.replace(/\./g,'');          // 1.234,56 -> 1234,56
   else if(nd > 1) t = t.replace(/\./g,'');               // 3.300.000 -> 3300000
+  else if(nd === 1 && nc === 0 && /^[1-9]\d{0,2}\.\d{3}$/.test(t)) t = t.replace('.', '');   // 10.000 -> 10000 (Türkçe binlik gösterim)
   else if(nc > 1) t = t.replace(/,/g,'');                // 3,300,000 -> 3300000
   return parseFloat(t.replace(',', '.'));
 }
@@ -453,7 +481,56 @@ function spark(h,up){
   return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none"><polyline fill="none" stroke="${up?'var(--green)':'var(--red)'}" stroke-width="1.5" points="${pts}"/></svg>`;
 }
 
-function bigChart(h,up){
+let chartSnap = {}, chartHold = false;
+function fmtT(ts){
+  const d = new Date(ts), n = new Date();
+  const hm = d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  return d.toDateString() === n.toDateString() ? hm : d.toLocaleDateString('tr-TR', {day:'2-digit', month:'2-digit'}) + ' ' + hm.slice(0,5);
+}
+function tipHtml(sn, i){
+  const v = sn.v[i], t = sn.t && sn.t[i], base = sn.v[0], prev = i > 0 ? sn.v[i-1] : v;
+  const pb = (v / base - 1) * 100, pp = prev ? (v / prev - 1) * 100 : 0;
+  const sg = x => x >= 0 ? '+' : '-';
+  let h = (t ? `<div class="ctm">🕒 ${fmtT(t)}</div>` : '') + `<b>${fmtRaw(v)} ${sn.q || ''}</b>`;
+  h += `<div class="${pb >= 0 ? 'g' : 'r'}">grafik başına göre ${sg(pb)}%${fmtPct(Math.abs(pb))}</div>`;
+  if(sn.entry){ const pe = (v / sn.entry - 1) * 100; h += `<div class="${pe >= 0 ? 'g' : 'r'}">alışa göre ${sg(pe)}%${fmtPct(Math.abs(pe))}</div>`; }
+  h += `<div style="color:var(--sub)">önceki noktaya göre ${sg(pp)}%${fmtPct(Math.abs(pp))}</div>`;
+  return h;
+}
+function chartHoverBind(root, onRelease){
+  if(!root || root.dataset.hb) return;
+  root.dataset.hb = '1';
+  let pressed = false, relT = null;
+  const release = () => { clearTimeout(relT); if(!chartHold) return; chartHold = false; try { onRelease(); } catch(e){} };
+  const show = e => {
+    const w = e.target.closest && e.target.closest('.cwrap'); if(!w) return;
+    const sn = chartSnap[w.dataset.snap]; if(!sn) return;
+    const r = w.getBoundingClientRect(); if(!r.width) return;
+    chartHold = true; clearTimeout(relT);
+    const ratio = clamp((e.clientX - r.left) / r.width, 0, 1), n = sn.v.length;
+    const i = clamp(Math.round(((ratio * sn.w - sn.pd) / (sn.w - 2 * sn.pd)) * (n - 1)), 0, n - 1);
+    const xp = (sn.pd + i / (n - 1) * (sn.w - 2 * sn.pd)) / sn.w * 100;
+    const yp = (sn.ht - sn.pd - ((sn.v[i] - sn.mn) / (sn.mx - sn.mn)) * (sn.ht - sn.pd * 2)) / sn.ht * 100;
+    const ln = w.querySelector('.cline'), dt = w.querySelector('.chdot'), tp = w.querySelector('.ctip');
+    if(!ln || !dt || !tp) return;
+    ln.style.display = 'block'; ln.style.left = xp + '%';
+    dt.style.display = 'block'; dt.style.left = xp + '%'; dt.style.top = yp + '%';
+    tp.innerHTML = tipHtml(sn, i); tp.style.display = 'block';
+    if(xp > 55){ tp.style.left = 'auto'; tp.style.right = (100 - xp + 2) + '%'; } else { tp.style.right = 'auto'; tp.style.left = (xp + 2) + '%'; }
+  };
+  root.addEventListener('pointermove', e => { if(e.pointerType === 'mouse' || pressed) show(e); });
+  root.addEventListener('pointerdown', e => {
+    const w = e.target.closest && e.target.closest('.cwrap'); if(!w) return;
+    pressed = true; try { w.setPointerCapture(e.pointerId); } catch(_){}
+    show(e);
+  });
+  const up = e => { if(!pressed) return; pressed = false; if(e.pointerType !== 'mouse'){ clearTimeout(relT); relT = setTimeout(release, 3000); } };
+  root.addEventListener('pointerup', up);
+  root.addEventListener('pointercancel', up);
+  root.addEventListener('pointerleave', e => { if(e.pointerType === 'mouse') release(); });
+}
+function bigChart(h,up,ts,q,key){
+  key = key || 'dChart';
   const w=420,ht=120,pd=6;
   if(!h||h.length<2) return `<div class="cwrap" style="height:${ht}px;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12px">Veri toplanıyor…</div>`;
   let mn=Math.min(...h),mx=Math.max(...h);
@@ -466,7 +543,10 @@ function bigChart(h,up){
   const col=up?'var(--green)':'var(--red)';
   const gid=up?'gradUp':'gradDn';
   const ly=Y(h[h.length-1]);
-  return `<div class="cwrap" style="--dotc:${col}"><svg viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity="0.35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><polygon fill="url(#${gid})" points="${area}"/><line x1="${pd}" x2="${w-pd}" y1="${ly.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4 4" opacity=".5" vector-effect="non-scaling-stroke"/><polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${line}"/></svg><span class="pdot" style="left:${((w-pd)/w*100).toFixed(2)}%;top:${(ly/ht*100).toFixed(2)}%"></span></div>`;
+  const hasT = ts && ts.length === h.length;
+  chartSnap[key] = {v: h, t: hasT ? ts : null, mn, mx, ht, w, pd, q: q || ''};
+  const ax = hasT ? `<div class="caxis"><span>${fmtT(ts[0])}</span><span>${fmtT(ts[Math.floor(ts.length/2)])}</span><span>şimdi</span></div>` : '';
+  return `<div class="cwrap" data-snap="${key}" style="--dotc:${col}"><svg viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity="0.35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><polygon fill="url(#${gid})" points="${area}"/><line x1="${pd}" x2="${w-pd}" y1="${ly.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4 4" opacity=".5" vector-effect="non-scaling-stroke"/><polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${line}"/></svg><span class="pdot" style="left:${((w-pd)/w*100).toFixed(2)}%;top:${(ly/ht*100).toFixed(2)}%"></span><span class="cline"></span><span class="chdot"></span><div class="ctip"></div></div>${ax}<div class="chint">Grafiğin üzerinde gezinin veya parmağınızı kaydırın: saat ve fiyat görünür.</div>`;
 }
 
 function rsi(h){
@@ -686,11 +766,18 @@ function checkAlerts(){
 
 let detailSym=null;
 function openDetail(sym){detailSym=sym;renderDetail(true);const c=market.find(x=>x.s===sym);if(c)seedChart(c);}
-function closeDetail(){detailSym=null;document.getElementById('modalHost').innerHTML='';}
-function chartData(c){
-  const live = c.hist.slice(-90);
-  return c.seed && c.seed.length ? c.seed.slice(-120).concat(live) : c.hist;
+function closeDetail(){detailSym=null;chartHold=false;document.getElementById('modalHost').innerHTML='';}
+function chartPts(c){
+  const lv = c.hist.slice(-90), lt = (c.ht || []).slice(-90);
+  if(c.seed && c.seed.length && c.seedT && c.seedT.length === c.seed.length && lt.length === lv.length){
+    const n = Math.min(120, c.seed.length), sv = c.seed.slice(-n), st = c.seedT.slice(-n);
+    const t0 = lt.length ? lt[0] : Infinity, v = [], t = [];
+    st.forEach((x, i) => { if(x < t0){ v.push(sv[i]); t.push(x); } });
+    return {v: v.concat(lv), t: t.concat(lt)};
+  }
+  return {v: c.hist.slice(), t: (c.ht && c.ht.length === c.hist.length) ? c.ht.slice() : null};
 }
+function chartData(c){ return chartPts(c).v; }
 async function seedChart(c){
   if(c.seedTried || !c.ps) return;
   c.seedTried = true;
@@ -701,8 +788,15 @@ async function seedChart(c){
     try {
       const d = await fetchWithTimeout(url, 5000);
       const cl = (d && (d.c || (d.data && d.data.c))) || [];
-      const arr = cl.map(Number).filter(x => x > 0);
-      if(arr.length > 5){ c.seed = arr; renderDetail(false); return; }
+      const tt = (d && (d.t || (d.data && d.data.t))) || [];
+      const arr = [], at = [];
+      cl.forEach((v, i) => {
+        const x = Number(v); if(!(x > 0)) return;
+        const tv = Number(tt[i]);
+        arr.push(x);
+        at.push(tv > 1e9 ? (tv > 1e12 ? tv : tv * 1000) : (from + i * 60) * 1000);
+      });
+      if(arr.length > 5){ c.seed = arr; c.seedT = at; renderDetail(false); return; }
     } catch(e){}
   }
 }
@@ -783,10 +877,13 @@ function renderDetail(rebuild){
       <div class="alarmbox"><input type="text" inputmode="decimal" id="dAlarm" placeholder="Hedef fiyat (${c.q})"><button id="dAlarmBtn">Alarm Kur</button></div>
       <div style="margin:-6px 0 8px"><a href="#" id="dBeepTest" style="color:var(--yellow);font-size:12px">🔊 Sesi dene</a></div>
       <div id="dAlarmInfo" style="font-size:12px;color:var(--sub);margin-bottom:12px"></div>
-      <div class="mbtns"><button class="tbtn g big2">Al</button><button class="tbtn r big2">Sat</button><button class="tbtn big2" id="dTrack" style="background:rgba(240,185,11,.15);color:var(--yellow)">📌 Takibe Al</button></div>
+      <div class="mbtns"><button class="tbtn g big2" id="dBuy">Al</button><button class="tbtn r big2" id="dSell">Sat</button><button class="tbtn big2" id="dTrack" style="background:rgba(240,185,11,.15);color:var(--yellow)">📌 Takibe Al</button></div>
     </div></div>`;
     document.getElementById('dmodal').onclick=e=>{if(e.target.id==='dmodal')closeDetail();};
     document.getElementById('dx').onclick=closeDetail;
+    chartHoverBind(document.getElementById('dChart'), () => renderDetail(false));
+    document.getElementById('dBuy').onclick=()=>{unlockAudio();openOrder(c.s,'buy');};
+    document.getElementById('dSell').onclick=()=>{unlockAudio();openOrder(c.s,'sell');};
     document.getElementById('dTrack').onclick=()=>{unlockAudio();openTrackForm(c.s,'short');};
     document.getElementById('dBeepTest').onclick=e=>{e.preventDefault();unlockAudio();beepOnce();setTimeout(beepOnce,300);setTimeout(beepOnce,600);};
     document.getElementById('dAlarmBtn').onclick=()=>{
@@ -802,7 +899,8 @@ function renderDetail(rebuild){
   }
   const g=id=>document.getElementById(id);
   if(!g('dBig'))return;
-  flashVal('dBig',c.price);flashVal('dBid',bid);flashVal('dAsk',ask);flashVal('dLow',c.low);flashVal('dHigh',c.high);
+  flashVal('dBig',c.price);flashVal('dBid',bid);flashVal('dAsk',ask);
+  {const bb=g('dBuy'),sb=g('dSell');if(bb)bb.innerHTML='Al<small>'+fmtRaw(ask)+'</small>';if(sb)sb.innerHTML='Sat<small>'+fmtRaw(bid)+'</small>';}flashVal('dLow',c.low);flashVal('dHigh',c.high);
   g('dBig').innerHTML=fmtRaw(c.price)+' <span>'+c.q+'</span>';g('dBig').className='big '+(up?'g':'r');
   g('dChg').textContent=(up?'▲ +':'▼ ')+fmtPct(ch)+'%';g('dChg').className='chg '+(up?'g':'r');
   
@@ -814,7 +912,7 @@ function renderDetail(rebuild){
   g('dVol').textContent=fmtVol(c.vb);
   g('dVolQ').textContent=fmtVol(c.vol);
   
-  const ce=g('dChart');if(ce)ce.innerHTML=bigChart(chartData(c),up);
+  const ce=g('dChart');if(ce&&!chartHold){const P=chartPts(c);ce.innerHTML=bigChart(P.v,up,P.t,c.q);}
   const rg=g('dRange');if(rg&&chartData(c).length>1){const cd=chartData(c);rg.textContent='Min '+fmtRaw(Math.min(...cd))+' · Maks '+fmtRaw(Math.max(...cd))+'  ';}
   const lv=g('dLv');if(lv){lv.textContent=fmtRaw(c.price)+' '+c.q;lv.style.color=up?'var(--green)':'var(--red)';}
   updateAlarmInfo(c);
@@ -873,7 +971,7 @@ function processData(list){
         alarm: alarmStore[s] || null,
         ps: i.pairSymbol || '', seed: null, seedTried: false, pid: 0, apid: 0, lastPush: 0,
         prevPrice: price,
-        hist: [price]
+        hist: [price], ht: [Date.now()]
       };
       mkt[s] = c;
     }
@@ -904,8 +1002,8 @@ function processData(list){
 
     const nowT = Date.now();
     if(price !== c.hist[c.hist.length-1] || nowT - c.lastPush > 5000){
-      c.hist.push(price); c.pid++; c.lastPush = nowT;
-      if(c.hist.length > 180) c.hist.shift();
+      c.hist.push(price); c.ht.push(nowT); c.pid++; c.lastPush = nowT;
+      if(c.hist.length > 180){ c.hist.shift(); c.ht.shift(); }
     }
   });
 
@@ -1462,7 +1560,7 @@ function fireAlert(p, c, pnl, kind){
 function checkPositions(){
   let ch = false;
   positions.forEach(p => {
-    const c = mkt[p.s]; if(!c || !(c.price > 0)) return;
+    const c = mkt[p.s]; if(!c || !(c.price > 0) || !(p.warn > 0)) return;
     const pnl = (c.price / p.entry - 1) * 100;
     if(c.price > p.peak){ p.peak = c.price; if(p.trail){ p.trail = false; ch = true; } }
     const fromPeak = (c.price / p.peak - 1) * 100;
@@ -1630,7 +1728,7 @@ function oppItem(x, key, open){
   const A = x.a, chips = (A.conds || []).map(cd => `<span class="cd ${cd.ok === true ? 'ok' : cd.ok === false ? 'no' : 'na'}">${cd.ok === true ? '✅' : cd.ok === false ? '❌' : '➖'} ${cd.l}</span>`).join('');
   const bt = A.bt && A.bt.n >= 3 ? `<div class="ot sub">📊 Geçmiş test (${key === 'long' ? 'son ~1 yıl, 14 günlük tutuş' : 'son ~30 gün, 24 saatlik tutuş'}): ${A.bt.n} sinyal · isabet %${Math.round(A.bt.win)} · ortalama ${A.bt.avg >= 0 ? '+' : '-'}%${AB(A.bt.avg)} · stop'a değen %${Math.round(A.bt.stopRate)} · en kötü ${A.bt.worst >= 0 ? '+' : '-'}%${AB(A.bt.worst)}. <span style="opacity:.8">Geçmiş performans geleceği garanti etmez.</span></div>` : '';
   const size = `<div class="ot sub">🛡️ Risk kuralı: stop mesafesi yaklaşık %${fmtPct(A.stop)}. Sermayenizin yüzde 1 kadarını riske atmak istiyorsanız bu işleme en fazla sermayenizin yüzde ${Math.max(1, Math.min(100, Math.round(100 / A.stop)))} kadarını ayırın.</div>`;
-  return `<div class="opp"><div class="oh"><b>${x.c.b}/${x.c.q}</b>${isNew ? '<span class="badge" style="background:var(--purple);color:#000">🆕 YENİ</span>' : ''}<span class="badge ${cls}">${sc} · ${A.pass ? label(sc) : 'Şartlar eksik'}</span><span class="badge ${A.pass ? 'bg-g' : 'rk-m'}">Teyit ${A.passN}/${A.total}</span><span class="badge rk-${x.r === 'Yüksek' ? 'h' : x.r === 'Düşük' ? 'l' : 'm'}">Risk: ${x.r}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:700">${up ? '+' : ''}${fmtPct(x.c.dp || 0)}%</span></div><div class="ot">${A.text}</div>${bt}${size}<details class="cdl" ${open ? 'open' : ''}><summary>Neden bu coin? Koşul listesi</summary><div class="cdw">${chips}</div></details><div class="oa"><button class="clrbtn" data-det="${x.s}">Detay</button><button class="clrbtn" data-trk="${x.s}" data-hz="${key}">📌 Takibe Al</button></div></div>`;
+  return `<div class="opp"><div class="oh"><b>${x.c.b}/${x.c.q}</b>${isNew ? '<span class="badge" style="background:var(--purple);color:#000">🆕 YENİ</span>' : ''}<span class="badge ${cls}">${sc} · ${A.pass ? label(sc) : 'Şartlar eksik'}</span><span class="badge ${A.pass ? 'bg-g' : 'rk-m'}">Teyit ${A.passN}/${A.total}</span><span class="badge rk-${x.r === 'Yüksek' ? 'h' : x.r === 'Düşük' ? 'l' : 'm'}">Risk: ${x.r}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:700">${up ? '+' : ''}${fmtPct(x.c.dp || 0)}%</span></div><div class="ot">${A.text}</div>${bt}${size}<details class="cdl" ${open ? 'open' : ''}><summary>Neden bu coin? Koşul listesi</summary><div class="cdw">${chips}</div></details><div class="oa"><button class="clrbtn" data-det="${x.s}">Detay</button><button class="clrbtn" data-trk="${x.s}" data-hz="${key}">📌 Takibe Al</button><button class="clrbtn" data-buy="${x.s}">🧪 Sanal Al</button></div></div>`;
 }
 function regimeBanner(){
   const cl = regime.t === 'Düşüş' ? 'rk-h' : regime.t === 'Yükseliş' ? 'bg-g' : 'rk-m';
@@ -1647,7 +1745,7 @@ function renderOpp(){
     const tm = scanInfo.t ? new Date(scanInfo.t).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '—';
     st.innerHTML = `Analiz: ${scanInfo.done}/${scanInfo.total} coin · güncelleme ${tm}` + (scanInfo.ok ? '' : ' · <span class="y">⚠ geçmiş veri alınamadı, fırsat listesi kapalı</span>');
   }
-  if(oppTab === 'pos'){ box.innerHTML = renderPositions(); bindOpp(box); return; }
+  if(oppTab === 'pos'){ if(chartHold) return; box.innerHTML = renderPositions(); bindOpp(box); return; }
   if(oppTab === 'log'){ box.innerHTML = renderLog(); bindOpp(box); return; }
   const key = oppTab === 'long' ? 'long' : 'short';
   const arr = Object.keys(an).map(s => ({s, a: an[s][key], r: an[s].risk, c: mkt[s]})).filter(x => x.a && x.c).sort((x,y) => y.a.score - x.a.score);
@@ -1675,7 +1773,7 @@ function durTxt(ms){
 function tryEq(v, q){ const u = mkt['USDT']; return (q === 'USDT' && u && u.price > 0) ? ` (≈ ${fmtMoney(v * u.price)} TRY)` : ''; }
 function sgn(v){ return v >= 0 ? '+' : '-'; }
 function entryChart(c, p, stopP){
-  const data = chartData(c);
+  const P = chartPts(c), data = P.v;
   if(!data || data.length < 2) return '';
   const w = 420, ht = 90, pd = 6;
   const all = data.concat([p.entry, stopP]);
@@ -1686,7 +1784,10 @@ function entryChart(c, p, stopP){
   const up = c.price >= p.entry, col = up ? 'var(--green)' : 'var(--red)';
   const pts = data.map((v,i) => X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join(' ');
   const ln = (v, cl) => `<line x1="${pd}" x2="${w-pd}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="${cl}" stroke-width="1" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`;
-  return `<svg viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none" style="display:block;width:100%;height:90px;margin:8px 0 2px">${ln(p.entry,'var(--yellow)')}${ln(stopP,'var(--red)')}<polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${pts}"/></svg><div style="font-size:10px;color:var(--sub);display:flex;gap:12px;flex-wrap:wrap"><span><span class="y">- -</span> alış</span><span><span class="r">- -</span> uyarı seviyesi</span><span><span style="color:${col}">━</span> fiyat</span></div>`;
+  const key = 'pos' + p.id;
+  const hasT = P.t && P.t.length === data.length;
+  chartSnap[key] = {v: data, t: hasT ? P.t : null, mn, mx, ht, w, pd, q: c.q, entry: p.entry};
+  return `<div class="cwrap" data-snap="${key}" style="--dotc:${col};margin:8px 0 2px"><svg viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none" style="display:block;width:100%;height:90px">${ln(p.entry,'var(--yellow)')}${ln(stopP,'var(--red)')}<polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${pts}"/></svg><span class="cline"></span><span class="chdot"></span><div class="ctip"></div></div>${hasT ? `<div class="caxis"><span>${fmtT(P.t[0])}</span><span>şimdi</span></div>` : ''}<div style="font-size:10px;color:var(--sub);display:flex;gap:12px;flex-wrap:wrap"><span><span class="y">- -</span> alış</span><span><span class="r">- -</span> uyarı seviyesi</span><span><span style="color:${col}">━</span> fiyat</span><span>· üzerinde gezinin: saat ve fiyat</span></div>`;
 }
 function amountBlock(p, c, stopP){
   const b = c.b, q = c.q, amt = p.amt;
@@ -1728,7 +1829,7 @@ function renderPositions(){
     const outlook = sec ? `<div class="ot" style="margin-top:8px"><b>Güncel görünüm (${p.hz === 'long' ? 'uzun' : 'kısa'} vade, ${sec.score} · ${label(sec.score)}):</b> ${sec.text}</div>` : '';
     const spread = c.ask > 0 && c.bid > 0 ? (c.ask - c.bid) / c.price * 100 : 0;
     const box = (l, v, cl) => `<div class="mi"><span>${l}</span><b class="${cl || ''}">${v}</b></div>`;
-    return `<div class="opp"><div class="oh"><b>${c.b}/${c.q}</b><span class="badge ${p.hz === 'long' ? 'bg-y' : 'bg-n'}">${p.hz === 'long' ? 'Uzun vade' : 'Kısa vade'}</span><span class="badge ${pnl <= -p.warn ? 'rk-h' : up ? 'bg-g' : 'rk-m'}">${status}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:800;font-size:16px">${sgn(pnl)}${fmtPct(Math.abs(pnl))}%</span></div>
+    return `<div class="opp"><div class="oh"><b>${c.b}/${c.q}</b>${p.sim ? '<span class="badge rk-m">🧪 SANAL</span>' : ''}<span class="badge ${p.hz === 'long' ? 'bg-y' : 'bg-n'}">${p.hz === 'long' ? 'Uzun vade' : 'Kısa vade'}</span><span class="badge ${pnl <= -p.warn ? 'rk-h' : up ? 'bg-g' : 'rk-m'}">${status}</span><span class="${up ? 'g' : 'r'}" style="margin-left:auto;font-weight:800;font-size:16px">${sgn(pnl)}${fmtPct(Math.abs(pnl))}%</span></div>
       <div class="mgrid">
         ${box('Alış fiyatı', fmtRaw(p.entry) + ' ' + c.q + tryEq(p.entry, c.q))}
         ${box('Şimdiki fiyat', fmtRaw(c.price) + ' ' + c.q + tryEq(c.price, c.q), up ? 'g' : 'r')}
@@ -1747,7 +1848,7 @@ function renderPositions(){
       ${amountBlock(p, c, stopP)}
       <div class="ot" style="margin-top:8px">${note}</div>
       ${outlook}
-      <div class="oa"><button class="clrbtn" data-det="${p.s}">Detay</button><button class="clrbtn" data-edit="${p.id}">✏️ Düzenle</button><button class="clrbtn" data-del="${p.id}">✕ Takipten çıkar</button></div></div>`;
+      <div class="oa"><button class="clrbtn" data-det="${p.s}">Detay</button>${p.sim ? `<button class="clrbtn" data-sell="${p.s}">🔴 Sat</button><button class="clrbtn" data-buy="${p.s}">🟢 Daha al</button>` : `<button class="clrbtn" data-edit="${p.id}">✏️ Düzenle</button><button class="clrbtn" data-del="${p.id}">✕ Takipten çıkar</button>`}</div></div>`;
   }).join('');
 }
 function posStatus(p, c, pnl){
@@ -1764,6 +1865,8 @@ function posStatus(p, c, pnl){
 function bindOpp(box){
   box.querySelectorAll('[data-det]').forEach(el => el.onclick = () => openDetail(el.dataset.det));
   box.querySelectorAll('[data-trk]').forEach(el => el.onclick = () => openTrackForm(el.dataset.trk, el.dataset.hz));
+  box.querySelectorAll('[data-sell]').forEach(el => el.onclick = () => openOrder(el.dataset.sell, 'sell'));
+  box.querySelectorAll('[data-buy]').forEach(el => el.onclick = () => openOrder(el.dataset.buy, 'buy'));
   box.querySelectorAll('[data-edit]').forEach(el => el.onclick = () => { const q = positions.find(x => String(x.id) === el.dataset.edit); if(q) openTrackForm(q.s, q.hz, q.id); });
   box.querySelectorAll('[data-del]').forEach(el => el.onclick = () => { positions = positions.filter(p => String(p.id) !== el.dataset.del); savePos(); renderOpp(); });
   const lc = document.getElementById('logClear'); if(lc) lc.onclick = () => { if(confirm('Karne kayıtları silinsin mi?')){ oppLog = []; saveLog(); renderOpp(); } };
@@ -1781,9 +1884,300 @@ function bindOpp(box){
   }
   const rb = document.getElementById('oppRefresh'); if(rb) rb.onclick = () => { unlockAudio(); refreshNow(); };
 })();
+chartHoverBind(document.getElementById('oppBox'), () => renderOpp());
 setInterval(scanAll, 15000);
 setInterval(() => { if(oppTab === 'pos' && !document.getElementById('trackModal')) renderOpp(); }, 1500);
 histWorker();
+
+// ================= SANAL AL / SAT (gerçek para kullanılmaz) =================
+const SIM_DEF = 100000;
+let sim = {start: SIM_DEF, cash: SIM_DEF, fee: 0.15, trades: [], eq: [], t0: Date.now()};
+try { const x = JSON.parse(localStorage.getItem('btc_sim') || 'null'); if(x && typeof x.cash === 'number') sim = Object.assign(sim, x); } catch(e){}
+if(!sim.eq || !sim.eq.length) sim.eq = [{t: sim.t0, v: sim.cash}];
+function saveSim(){ try { localStorage.setItem('btc_sim', JSON.stringify(sim)); } catch(e){} }
+const sumA = a => a.reduce((x,y) => x + y, 0);
+function rateOf(q){ if(q === 'USDT'){ const u = mkt['USDT']; return u && u.price > 0 ? u.price : 0; } return 1; }
+function simPos(s){ return positions.find(p => p.sim && p.s === s); }
+function simEquity(){
+  let pv = 0, cost = 0;
+  positions.forEach(p => {
+    if(!p.sim) return;
+    const c = mkt[p.s]; if(!c) return;
+    pv += p.amt * (c.bid > 0 ? c.bid : c.price) * rateOf(c.q);
+    cost += p.costTRY || 0;
+  });
+  return {cash: sim.cash, pv, cost, eq: sim.cash + pv};
+}
+let odTimer = null, odFrac = null;
+function closeOrder(){ const m = document.getElementById('orderModal'); if(m) m.remove(); if(odTimer){ clearInterval(odTimer); odTimer = null; } odFrac = null; }
+function odCalc(c, side, mode, v, feeP){
+  const price = side === 'buy' ? (c.ask > 0 ? c.ask : c.price) : (c.bid > 0 ? c.bid : c.price);
+  const rate = rateOf(c.q), f = feeP / 100;
+  let amt = side === 'buy' ? (mode === 'val' ? v / (price * (1 + f)) : v) : (mode === 'val' ? v / price : v);
+  if(!(amt > 0)) amt = 0;
+  const gross = amt * price, fee = gross * f, total = side === 'buy' ? gross + fee : gross - fee;
+  return {price, rate, amt, gross, fee, total, totalTRY: total * rate, feeTRY: fee * rate, grossTRY: gross * rate};
+}
+function openOrder(s, side){
+  const c = mkt[s]; if(!c) return;
+  closeOrder();
+  const pos = simPos(s);
+  const d = document.createElement('div');
+  d.className = 'modal'; d.id = 'orderModal'; d.style.zIndex = 220;
+  const head = `<div class="mhead"><div class="mtit"><b>${side === 'buy' ? '🟢 Al' : '🔴 Sat'} · ${c.b}/${c.q}</b></div><span class="close" id="odX">✕</span></div>`;
+  if(side === 'sell' && !pos){
+    d.innerHTML = `<div class="mcard" style="max-width:420px">${head}<div class="ot">Bu coinde sanal pozisyonunuz yok, satılacak bir şey bulunmuyor. Önce <b>Al</b> ile sanal alım yapın.</div><div class="mbtns" style="margin-top:12px"><button class="tbtn big2" id="odNo" style="background:var(--panel2);color:var(--txt)">Tamam</button></div></div>`;
+    document.body.appendChild(d);
+    d.onclick = e => { if(e.target === d) closeOrder(); };
+    document.getElementById('odX').onclick = closeOrder; document.getElementById('odNo').onclick = closeOrder;
+    return;
+  }
+  const buy = side === 'buy';
+  d.innerHTML = `<div class="mcard" style="max-width:440px">${head}
+    <div class="ot" style="margin-bottom:8px"><span class="badge rk-m">🧪 SANAL İŞLEM</span> Gerçek para kullanılmaz. Emir, canlı alış/satış fiyatından anında gerçekleşir; komisyon düşülür.</div>
+    <div class="mgrid" style="margin-bottom:8px"><div class="mi" id="odBidBox"><span>Alış (bid)${buy ? '' : ' · satışta bu kullanılır'}</span><b id="odBid"></b></div><div class="mi" id="odAskBox"><span>Satış (ask)${buy ? ' · alımda bu kullanılır' : ''}</span><b id="odAsk"></b></div></div>
+    <div class="ot sub" id="odBal" style="margin:0 0 8px"></div>
+    <label class="fl">Giriş türü</label>
+    <select id="odMode"><option value="val">Tutar (${c.q})</option><option value="amt">Miktar (${c.b})</option></select>
+    <label class="fl" style="margin-top:8px" id="odLbl"></label>
+    <input type="text" inputmode="decimal" id="odIn" placeholder="0">
+    <div class="oa" style="margin:8px 0">${[0.25,0.5,0.75,1].map(p => `<button class="clrbtn" data-f="${p}">%${p * 100}</button>`).join('')}</div>
+    ${buy ? `<div class="row2"><div><label class="fl">Zarar uyarısı (%)</label><input type="text" inputmode="decimal" id="odWarn" value="${pos ? plain(pos.warn) : '5'}"></div>${pos ? '' : '<div><label class="fl">Vade</label><select id="odHz"><option value="short">Kısa vade</option><option value="long">Uzun vade</option></select></div>'}</div>` : ''}
+    <div class="ot" id="odPrev" style="margin-top:10px;padding:10px;background:var(--panel2);border-radius:8px"></div>
+    <div id="odErr" style="color:var(--red);font-size:12.5px;margin-top:6px;min-height:16px"></div>
+    <div class="mbtns" style="margin-top:8px"><button class="tbtn ${buy ? 'g' : 'r'} big2" id="odOk">${buy ? 'Sanal Al' : 'Sanal Sat'}</button><button class="tbtn big2" id="odNo" style="background:var(--panel2);color:var(--txt)">İptal</button></div></div>`;
+  document.body.appendChild(d);
+  d.onclick = e => { if(e.target === d) closeOrder(); };
+  document.getElementById('odX').onclick = closeOrder; document.getElementById('odNo').onclick = closeOrder;
+  const $ = id => document.getElementById(id);
+  $('odMode').value = buy ? 'val' : 'amt';
+  const state = () => {
+    const mode = $('odMode').value;
+    let v = parseNum($('odIn').value);
+    if(odFrac != null){
+      if(buy){ const r = rateOf(c.q); v = r > 0 ? sim.cash * odFrac / r : 0; }
+      else v = pos.amt * odFrac;
+    }
+    const m = (odFrac != null) ? (buy ? 'val' : 'amt') : mode;
+    return {mode: m, v: isNaN(v) ? 0 : v};
+  };
+  const upd = () => {
+    const cc = mkt[s]; if(!cc || !$('odPrev')) return;
+    const rate = rateOf(cc.q);
+    $('odBid').textContent = fmtRaw(cc.bid > 0 ? cc.bid : cc.price) + ' ' + cc.q;
+    $('odAsk').textContent = fmtRaw(cc.ask > 0 ? cc.ask : cc.price) + ' ' + cc.q;
+    $('odAskBox').style.boxShadow = buy ? '0 0 0 1px var(--yellow) inset' : 'none';
+    $('odBidBox').style.boxShadow = buy ? 'none' : '0 0 0 1px var(--yellow) inset';
+    const cur = simPos(s);
+    $('odBal').innerHTML = buy ? `Nakit: <b>${fmtMoney(sim.cash)} TRY</b>${cur ? ` · Eldeki: ${fmtRaw(cur.amt)} ${cc.b}` : ''}` : `Eldeki: <b>${fmtRaw(cur ? cur.amt : 0)} ${cc.b}</b> · ort. alış ${fmtRaw(cur ? cur.entry : 0)} ${cc.q}`;
+    $('odLbl').textContent = state().mode === 'val' ? `Tutar (${cc.q}) ${buy ? '— komisyon dahil toplam harcama' : '— brüt satış tutarı'}` : `Miktar (${cc.b})`;
+    const st = state(), r = odCalc(cc, side, st.mode, st.v, sim.fee);
+    let err = '', html = '';
+    if(!(rate > 0)) err = 'USDT/TRY kuru henüz yüklenmedi, işlem yapılamıyor.';
+    else if(!(r.amt > 0)) html = '<span style="color:var(--sub)">Tutar veya miktar girin ya da yüzde düğmelerinden birine basın.</span>';
+    else if(buy){
+      if(r.totalTRY > sim.cash + 1e-6) err = `Yetersiz nakit: ${fmtMoney(r.totalTRY)} TRY gerekiyor, nakit ${fmtMoney(sim.cash)} TRY.`;
+      html = `Fiyat <b>${fmtRaw(r.price)} ${cc.q}</b> · Miktar <b>${fmtRaw(r.amt)} ${cc.b}</b><br>Brüt ${fmtMoney(r.gross)} ${cc.q} · komisyon (%${fmtPct(sim.fee)}) ${fmtMoney(r.fee)} ${cc.q}<br><b>Toplam ödenecek: ${fmtMoney(r.total)} ${cc.q}</b>${tryEq(r.total, cc.q)}<br><span style="color:var(--sub)">İşlem sonrası nakit: ${fmtMoney(sim.cash - r.totalTRY)} TRY</span>`;
+    } else {
+      if(r.amt > cur.amt * (1 + 1e-9)) err = `Eldeki miktardan fazla satılamaz (${fmtRaw(cur.amt)} ${cc.b}).`;
+      const portion = Math.min(1, r.amt / cur.amt), costP = (cur.costTRY || 0) * portion, pnl = r.totalTRY - costP;
+      html = `Fiyat <b>${fmtRaw(r.price)} ${cc.q}</b> · Miktar <b>${fmtRaw(r.amt)} ${cc.b}</b><br>Brüt ${fmtMoney(r.gross)} ${cc.q} · komisyon (%${fmtPct(sim.fee)}) ${fmtMoney(r.fee)} ${cc.q}<br><b>Net alacak: ${fmtMoney(r.total)} ${cc.q}</b>${tryEq(r.total, cc.q)}<br><span class="${pnl >= 0 ? 'g' : 'r'}">Tahmini kâr/zarar: ${pnl >= 0 ? '+' : '-'}${fmtMoney(Math.abs(pnl))} TRY (${pnl >= 0 ? '+' : '-'}%${fmtPct(Math.abs(costP > 0 ? pnl / costP * 100 : 0))})</span><br><span style="color:var(--sub)">Kalan: ${fmtRaw(Math.max(0, cur.amt - r.amt))} ${cc.b}</span>`;
+    }
+    $('odPrev').innerHTML = html || '&nbsp;';
+    $('odErr').textContent = err;
+    $('odOk').disabled = !!err || !(r.amt > 0);
+    $('odOk').style.opacity = ($('odOk').disabled) ? .45 : 1;
+  };
+  $('odIn').oninput = () => { odFrac = null; upd(); };
+  $('odMode').onchange = () => { odFrac = null; upd(); };
+  d.querySelectorAll('[data-f]').forEach(b => b.onclick = () => {
+    odFrac = Number(b.dataset.f);
+    if(buy){ $('odMode').value = 'val'; const r = rateOf(c.q); $('odIn').value = r > 0 ? plain(sim.cash * odFrac / r) : ''; }
+    else { $('odMode').value = 'amt'; $('odIn').value = plain(pos.amt * odFrac); }
+    upd();
+  });
+  $('odOk').onclick = () => {
+    unlockAudio();
+    const cc = mkt[s]; if(!cc) return;
+    const st = state(), r = odCalc(cc, side, st.mode, st.v, sim.fee);
+    if(!(r.amt > 0) || !(r.rate > 0)) return;
+    const now = Date.now(), mid = (cc.ask > 0 && cc.bid > 0) ? (cc.ask + cc.bid) / 2 : r.price;
+    const spr = Math.abs(r.price - mid) * r.amt * r.rate;
+    let rec;
+    if(buy){
+      if(r.totalTRY > sim.cash + 1e-6) return;
+      const warn = parseNum($('odWarn').value);
+      if(!(warn > 0 && warn < 90)){ $('odErr').textContent = 'Zarar uyarısı 0 ile 90 arasında olmalı.'; return; }
+      sim.cash = Math.max(0, sim.cash - r.totalTRY);
+      let p = simPos(s);
+      if(!p){
+        p = {id: now, s, entry: r.price, amt: r.amt, hz: $('odHz') ? $('odHz').value : 'short', warn, peak: Math.max(r.price, cc.price), lastWarn: null, pre: false, trail: false, t: now, sim: true, costTRY: r.totalTRY};
+        positions.push(p);
+      } else {
+        p.entry = (p.entry * p.amt + r.price * r.amt) / (p.amt + r.amt);
+        p.amt += r.amt; p.costTRY = (p.costTRY || 0) + r.totalTRY; p.peak = Math.max(p.peak, cc.price);
+        if(warn !== p.warn){ p.warn = warn; p.lastWarn = null; p.pre = false; p.trail = false; }
+      }
+      rec = {id: now, t: now, side: 'buy', s, b: cc.b, q: cc.q, amt: r.amt, price: r.price, fee: r.fee, feeTRY: r.feeTRY, totalTRY: r.totalTRY, rate: r.rate, spr, pnl: null, pnlPct: null, hold: null, balAfter: sim.cash};
+    } else {
+      const p = simPos(s); if(!p) return;
+      const amt = Math.min(r.amt, p.amt), full = amt >= p.amt * (1 - 1e-9);
+      const portion = full ? 1 : amt / p.amt, costP = (p.costTRY || 0) * portion;
+      const rr = odCalc(cc, 'sell', 'amt', amt, sim.fee), pnl = rr.totalTRY - costP;
+      sim.cash += rr.totalTRY;
+      rec = {id: now, t: now, side: 'sell', s, b: cc.b, q: cc.q, amt, price: rr.price, fee: rr.fee, feeTRY: rr.feeTRY, totalTRY: rr.totalTRY, rate: rr.rate, spr: Math.abs(rr.price - mid) * amt * rr.rate, pnl, pnlPct: costP > 0 ? pnl / costP * 100 : 0, hold: now - p.t, balAfter: sim.cash};
+      if(full) positions = positions.filter(x => x !== p);
+      else { p.amt -= amt; p.costTRY = (p.costTRY || 0) - costP; }
+    }
+    sim.trades.unshift(rec); if(sim.trades.length > 500) sim.trades.length = 500;
+    saveSim(); savePos();
+    simSample(true);
+    showReceipt(d, rec);
+    renderSim(); renderOpp();
+  };
+  upd();
+  odTimer = setInterval(upd, 1000);
+}
+function showReceipt(d, t){
+  if(odTimer){ clearInterval(odTimer); odTimer = null; }
+  const buy = t.side === 'buy';
+  d.innerHTML = `<div class="mcard" style="max-width:420px"><div class="mhead"><div class="mtit"><b>${buy ? '✅ Sanal alım gerçekleşti' : '✅ Sanal satım gerçekleşti'}</b></div><span class="close" id="odX">✕</span></div>
+    <div class="ot"><b>${t.b}/${t.q}</b> · ${fmtT(t.t)}<br>Miktar: <b>${fmtRaw(t.amt)} ${t.b}</b> · fiyat <b>${fmtRaw(t.price)} ${t.q}</b><br>Komisyon: ${fmtMoney(t.fee)} ${t.q} · ${buy ? 'Ödenen' : 'Alınan'} toplam: <b>${fmtMoney(t.totalTRY)} TRY</b>${t.pnl != null ? `<br><span class="${t.pnl >= 0 ? 'g' : 'r'}"><b>Gerçekleşen kâr/zarar: ${t.pnl >= 0 ? '+' : '-'}${fmtMoney(Math.abs(t.pnl))} TRY (${t.pnl >= 0 ? '+' : '-'}%${fmtPct(Math.abs(t.pnlPct))})</b></span>` : ''}<br>Yeni nakit bakiyeniz: <b>${fmtMoney(t.balAfter)} TRY</b>${buy ? '<br><span style="color:var(--sub)">Pozisyon Takibim sekmesine eklendi; zarar uyarısı aktif.</span>' : ''}</div>
+    <div class="mbtns" style="margin-top:12px"><button class="tbtn big2" id="odNo" style="background:var(--yellow);color:#000">Tamam</button></div></div>`;
+  document.getElementById('odX').onclick = closeOrder; document.getElementById('odNo').onclick = closeOrder;
+}
+
+// ---------- hesap örnekleme ve rapor ----------
+function simSample(force){
+  const now = Date.now(), last = sim.eq[sim.eq.length - 1], e = simEquity();
+  if(force || !last || now - last.t >= 30000){
+    sim.eq.push({t: now, v: e.eq});
+    if(sim.eq.length > 700) sim.eq.shift();
+    saveSim();
+  }
+}
+function simStats(){
+  const E = simEquity(), tr = sim.trades, sells = tr.filter(x => x.side === 'sell');
+  const wins = sells.filter(x => x.pnl > 0), losses = sells.filter(x => x.pnl <= 0);
+  const realized = sumA(sells.map(x => x.pnl)), unreal = E.pv - E.cost;
+  const fees = sumA(tr.map(x => x.feeTRY || 0)), spr = sumA(tr.map(x => x.spr || 0));
+  const sw = sumA(wins.map(x => x.pnl)), sl = Math.abs(sumA(losses.map(x => x.pnl)));
+  let peak = sim.start, dd = 0;
+  sim.eq.forEach(p => { peak = Math.max(peak, p.v); dd = Math.min(dd, (p.v / peak - 1) * 100); });
+  peak = Math.max(peak, E.eq); dd = Math.min(dd, (E.eq / peak - 1) * 100);
+  const byCoin = {};
+  sells.forEach(x => { const o = byCoin[x.b] || (byCoin[x.b] = {b: x.b, real: 0, unr: 0, n: 0}); o.real += x.pnl; o.n++; });
+  positions.forEach(p => {
+    if(!p.sim) return; const c = mkt[p.s]; if(!c) return;
+    const o = byCoin[c.b] || (byCoin[c.b] = {b: c.b, real: 0, unr: 0, n: 0});
+    o.unr += p.amt * (c.bid > 0 ? c.bid : c.price) * rateOf(c.q) - (p.costTRY || 0);
+  });
+  const coins = Object.values(byCoin).map(o => Object.assign(o, {tot: o.real + o.unr})).sort((a,b) => b.tot - a.tot);
+  const best = sells.length ? sells.reduce((a,b) => b.pnl > a.pnl ? b : a) : null, worst = sells.length ? sells.reduce((a,b) => b.pnl < a.pnl ? b : a) : null;
+  const pos = positions.filter(p => p.sim && mkt[p.s]).map(p => { const c = mkt[p.s], v = p.amt * (c.bid > 0 ? c.bid : c.price) * rateOf(c.q); return {p, c, v, pnl: v - (p.costTRY || 0)}; });
+  const big = pos.length ? pos.reduce((a,b) => b.v > a.v ? b : a) : null;
+  return {E, tr, sells, wins, losses, realized, unreal, total: E.eq - sim.start, totalPct: (E.eq / sim.start - 1) * 100, fees, spr, sw, sl, pf: sl > 0 ? sw / sl : null, avgW: wins.length ? sw / wins.length : 0, avgL: losses.length ? -sl / losses.length : 0, dd, coins, best, worst, pos, big};
+}
+function simNarr(st){
+  const k = 'sim' + st.tr.length, P = st.totalPct, parts = [];
+  if(!st.tr.length) return `Henüz sanal işlem yapılmadı. Başlangıç bakiyeniz ${fmtMoney(sim.start)} TRY olarak duruyor; bir coinin detay penceresinde <b>Al</b> düğmesine basarak ilk sanal işleminizi yapabilirsiniz.`;
+  parts.push(P >= 0
+    ? pickV([`Sanal hesabınız başlangıca göre %${AB(P)} (+${fmtMoney(st.total)} TRY) kârda; toplam varlık ${fmtMoney(st.E.eq)} TRY.`, `Başlangıçtan bu yana +${fmtMoney(st.total)} TRY (%${AB(P)}) kazanç görünüyor, hesap değeri ${fmtMoney(st.E.eq)} TRY.`], k + 'a')
+    : pickV([`Sanal hesabınız başlangıca göre %${AB(P)} (-${fmtMoney(Math.abs(st.total))} TRY) zararda; toplam varlık ${fmtMoney(st.E.eq)} TRY.`, `Hesap başlangıçtan ${fmtMoney(Math.abs(st.total))} TRY (%${AB(P)}) aşağıda, güncel değer ${fmtMoney(st.E.eq)} TRY.`], k + 'b'));
+  if(st.pos.length && Math.abs(st.unreal) > Math.abs(st.realized) * 1.5 && Math.abs(st.unreal) > 1) parts.push(`Sonucun büyük kısmı henüz satılmamış pozisyonlardan geliyor (gerçekleşmemiş ${st.unreal >= 0 ? '+' : '-'}${fmtMoney(Math.abs(st.unreal))} TRY); piyasa değişirse bu rakam hızla değişebilir.`);
+  else if(st.sells.length) parts.push(`Kapanan işlemlerden gerçekleşen sonuç ${st.realized >= 0 ? '+' : '-'}${fmtMoney(Math.abs(st.realized))} TRY, açık pozisyonların anlık etkisi ${st.unreal >= 0 ? '+' : '-'}${fmtMoney(Math.abs(st.unreal))} TRY.`);
+  if(st.sells.length >= 3){
+    const wr = st.wins.length / st.sells.length * 100;
+    let t = `${st.sells.length} kapanan işlemin %${Math.round(wr)} kadarı kârla bitti (ortalama kazanç ${fmtMoney(st.avgW)}, ortalama kayıp ${fmtMoney(Math.abs(st.avgL))} TRY).`;
+    if(Math.abs(st.avgL) > st.avgW * 1.5 && st.avgW > 0) t += ' Kayıplar kazançlardan belirgin büyük; zararı geç kesip kârı erken alıyor olabilirsiniz.';
+    else if(wr < 40 && st.pf != null && st.pf > 1) t += ' İsabet düşük olsa da kazançlar büyük olduğu için net sonuç artıda.';
+    else if(wr >= 60 && st.pf != null && st.pf < 1) t += ' İsabet yüksek ama tek bir büyük kayıp birçok küçük kazancı silmiş.';
+    parts.push(t);
+  } else if(st.sells.length) parts.push(`Şu ana kadar ${st.sells.length} işlem kapandı; isabet oranı hakkında yorum yapmak için henüz erken (en az 3-5 kapanan işlem gerekir).`);
+  const cost = st.fees + st.spr;
+  if(cost > 0) parts.push(`Komisyon (${fmtMoney(st.fees)} TRY) ve alış-satış farkı (${fmtMoney(st.spr)} TRY) toplam ${fmtMoney(cost)} TRY maliyet yarattı${Math.abs(st.total) > 0 ? ` (net sonucun %${Math.round(cost / Math.abs(st.total) * 100)}'ine denk)` : ''}; sık al-sat bu maliyeti büyütür.`);
+  if(st.big && st.E.eq > 0 && st.big.v / st.E.eq > 0.5) parts.push(`Varlığınızın %${Math.round(st.big.v / st.E.eq * 100)} kadarı tek bir coinde (${st.big.c.b}); bu yoğunlaşma riski artırır.`);
+  if(st.dd < -3) parts.push(`Hesap değeri en yüksek seviyesinden en fazla %${AB(st.dd)} geriledi.`);
+  if(st.coins.length > 1) parts.push(`En çok katkı yapan coin ${st.coins[0].b} (${st.coins[0].tot >= 0 ? '+' : '-'}${fmtMoney(Math.abs(st.coins[0].tot))} TRY), en kötüsü ${st.coins[st.coins.length-1].b} (${st.coins[st.coins.length-1].tot >= 0 ? '+' : '-'}${fmtMoney(Math.abs(st.coins[st.coins.length-1].tot))} TRY).`);
+  parts.push(`Nakit payı %${Math.round(st.E.cash / Math.max(1, st.E.eq) * 100)}.`);
+  parts.push('<span style="color:var(--sub)">Bu bir simülasyondur: gerçek piyasada emirler kaymayla farklı fiyattan gerçekleşebilir ve sizin komisyon oranınız farklı olabilir.</span>');
+  return parts.join(' ');
+}
+function simCsv(){
+  const rows = [['Tarih','Yön','Coin','Birim','Miktar','Fiyat','Komisyon (birim)','Tutar TRY','K/Z TRY','K/Z %']];
+  sim.trades.slice().reverse().forEach(t => rows.push([new Date(t.t).toLocaleString('tr-TR'), t.side === 'buy' ? 'Al' : 'Sat', t.b, t.q, t.amt, t.price, t.fee, t.totalTRY.toFixed(2), t.pnl != null ? t.pnl.toFixed(2) : '', t.pnlPct != null ? t.pnlPct.toFixed(2) : '']));
+  return '\ufeff' + rows.map(r => r.map(x => '"' + String(x).replace(/"/g, '""') + '"').join(';')).join('\n');
+}
+function simText(){
+  const st = simStats(), strip = h => h.replace(/<[^>]+>/g, '');
+  const L = ['SANAL HESAP RAPORU · ' + new Date().toLocaleString('tr-TR'), 'Başlangıç: ' + fmtMoney(sim.start) + ' TRY', 'Toplam varlık: ' + fmtMoney(st.E.eq) + ' TRY (' + (st.total >= 0 ? '+' : '-') + '%' + AB(st.totalPct) + ')', 'Nakit: ' + fmtMoney(st.E.cash) + ' TRY', 'Gerçekleşen K/Z: ' + fmtMoney(st.realized) + ' TRY', 'Gerçekleşmemiş K/Z: ' + fmtMoney(st.unreal) + ' TRY', 'Komisyon: ' + fmtMoney(st.fees) + ' TRY · Fark maliyeti: ' + fmtMoney(st.spr) + ' TRY', '', strip(simNarr(st))];
+  return L.join('\n');
+}
+let simOpen = false;
+function renderSim(){
+  const box = document.getElementById('simBox'); if(!box) return;
+  const st = simStats(), box8 = (l, v, cl) => `<div class="mi"><span>${l}</span><b class="${cl || ''}">${v}</b></div>`;
+  const sg = x => x >= 0 ? '+' : '-', cc = x => x >= 0 ? 'g' : 'r';
+  const eqv = sim.eq.map(x => x.v).concat([st.E.eq]), eqt = sim.eq.map(x => x.t).concat([Date.now()]);
+  const chart = eqv.length >= 3 ? bigChart(eqv, st.E.eq >= sim.start, eqt, 'TRY', 'simChart') : '<div class="muted">Hesap grafiği, işlem yaptıkça ve zaman geçtikçe oluşur.</div>';
+  const posHtml = st.pos.length ? st.pos.map(x => {
+    const pp = x.p, c = x.c, pct = (pp.costTRY || 0) > 0 ? x.pnl / pp.costTRY * 100 : 0;
+    return `<div class="opp"><div class="oh"><b>${c.b}/${c.q}</b><span class="badge bg-n">${fmtRaw(pp.amt)} ${c.b}</span><span class="${cc(x.pnl)}" style="margin-left:auto;font-weight:800">${sg(x.pnl)}${fmtMoney(Math.abs(x.pnl))} TRY (${sg(pct)}%${fmtPct(Math.abs(pct))})</span></div><div class="ot sub">Ort. alış ${fmtRaw(pp.entry)} · şimdi (satış fiyatı) ${fmtRaw(c.bid > 0 ? c.bid : c.price)} ${c.q} · değer ${fmtMoney(x.v)} TRY</div><div class="oa"><button class="clrbtn" data-sell="${pp.s}">🔴 Sat</button><button class="clrbtn" data-buy="${pp.s}">🟢 Daha al</button><button class="clrbtn" data-det="${pp.s}">Detay</button></div></div>`;
+  }).join('') : '<div class="muted" style="text-align:left">Açık sanal pozisyon yok.</div>';
+  const coinRows = st.coins.length ? `<div class="trow th"><span>Coin</span><span>Gerçekleşen</span><span>Açık</span><span>Toplam</span></div>` + st.coins.map(o => `<div class="trow"><span><b>${o.b}</b></span><span class="${cc(o.real)}">${sg(o.real)}${fmtMoney(Math.abs(o.real))}</span><span class="${cc(o.unr)}">${sg(o.unr)}${fmtMoney(Math.abs(o.unr))}</span><span class="${cc(o.tot)}"><b>${sg(o.tot)}${fmtMoney(Math.abs(o.tot))}</b></span></div>`).join('') : '';
+  const trRows = st.tr.length ? `<div class="trow th"><span>Zaman</span><span>İşlem</span><span>Miktar @ fiyat</span><span>K/Z</span></div>` + st.tr.slice(0, 30).map(t => `<div class="trow"><span>${fmtT(t.t)}</span><span class="${t.side === 'buy' ? 'g' : 'r'}"><b>${t.side === 'buy' ? 'AL' : 'SAT'}</b> ${t.b}</span><span>${fmtRaw(t.amt)} @ ${fmtRaw(t.price)}</span><span class="${t.pnl == null ? '' : cc(t.pnl)}">${t.pnl == null ? '—' : sg(t.pnl) + fmtMoney(Math.abs(t.pnl))}</span></div>`).join('') : '<div class="muted" style="text-align:left">Henüz işlem yok.</div>';
+  box.innerHTML = `<div class="mgrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:12px">
+      ${box8('Toplam varlık', fmtMoney(st.E.eq) + ' TRY')}
+      ${box8('Toplam kâr/zarar', sg(st.total) + fmtMoney(Math.abs(st.total)) + ' TRY (' + sg(st.totalPct) + '%' + fmtPct(Math.abs(st.totalPct)) + ')', cc(st.total))}
+      ${box8('Nakit', fmtMoney(st.E.cash) + ' TRY')}
+      ${box8('Açık pozisyon değeri', fmtMoney(st.E.pv) + ' TRY')}
+      ${box8('Gerçekleşen K/Z', sg(st.realized) + fmtMoney(Math.abs(st.realized)) + ' TRY', cc(st.realized))}
+      ${box8('Gerçekleşmemiş K/Z', sg(st.unreal) + fmtMoney(Math.abs(st.unreal)) + ' TRY', cc(st.unreal))}
+      ${box8('Kazanma oranı', st.sells.length ? '%' + Math.round(st.wins.length / st.sells.length * 100) + ' (' + st.wins.length + '/' + st.sells.length + ')' : '—')}
+      ${box8('Kâr faktörü', st.pf == null ? '—' : fmtPct(st.pf))}
+      ${box8('En büyük düşüş', '%' + AB(st.dd), st.dd < -5 ? 'r' : '')}
+      ${box8('Komisyon + fark', fmtMoney(st.fees + st.spr) + ' TRY')}
+      ${box8('En iyi işlem', st.best ? st.best.b + ' ' + sg(st.best.pnl) + fmtMoney(Math.abs(st.best.pnl)) : '—', st.best ? cc(st.best.pnl) : '')}
+      ${box8('En kötü işlem', st.worst ? st.worst.b + ' ' + sg(st.worst.pnl) + fmtMoney(Math.abs(st.worst.pnl)) : '—', st.worst ? cc(st.worst.pnl) : '')}
+    </div>
+    <div class="ot" style="margin-bottom:12px"><b>📑 Rapor özeti</b><br>${simNarr(st)}</div>
+    <div style="margin-bottom:12px"><div class="ipt" style="font-size:14px;margin-bottom:6px">Hesap değeri grafiği</div>${chart}</div>
+    <div class="ipt" style="font-size:14px;margin-bottom:6px">Açık sanal pozisyonlar</div>${posHtml}
+    ${coinRows ? '<div class="ipt" style="font-size:14px;margin:12px 0 6px">Coin bazında sonuç (TRY)</div>' + coinRows : ''}
+    <div class="ipt" style="font-size:14px;margin:12px 0 6px">İşlem geçmişi <span class="cnt">${st.tr.length}</span></div>${trRows}
+    <div class="oa" style="margin-top:12px"><button class="clrbtn" id="simCopy">📋 Raporu kopyala</button><button class="clrbtn" id="simCsv">⬇️ CSV indir</button></div>
+    <div class="row2" style="margin-top:14px;align-items:flex-end;max-width:520px"><div><label class="fl">Başlangıç bakiyesi (TRY)</label><input type="text" inputmode="decimal" id="simStart" value="${plain(sim.start)}"></div><div><label class="fl">Komisyon (%, işlem başına)</label><input type="text" inputmode="decimal" id="simFee" value="${plain(sim.fee)}"></div></div>
+    <div class="oa" style="margin-top:8px"><button class="clrbtn" id="simReset" style="color:var(--red)">♻️ Hesabı sıfırla</button></div>
+    <div class="idesc">Komisyon oranını değiştirmek yalnızca bundan sonraki işlemleri etkiler. Sıfırlama tüm sanal işlemleri ve sanal pozisyonları siler.</div>`;
+  box.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => openOrder(b.dataset.sell, 'sell'));
+  box.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => openOrder(b.dataset.buy, 'buy'));
+  box.querySelectorAll('[data-det]').forEach(b => b.onclick = () => openDetail(b.dataset.det));
+  const cp = document.getElementById('simCopy');
+  if(cp) cp.onclick = async () => {
+    const t = simText();
+    try { await navigator.clipboard.writeText(t); cp.textContent = '✅ Kopyalandı'; } catch(e){ const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); cp.textContent = '✅ Kopyalandı'; } catch(_){} ta.remove(); }
+    setTimeout(() => { if(cp) cp.textContent = '📋 Raporu kopyala'; }, 1800);
+  };
+  const cs = document.getElementById('simCsv');
+  if(cs) cs.onclick = () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([simCsv()], {type: 'text/csv;charset=utf-8'}));
+    a.download = 'sanal-islemler.csv'; document.body.appendChild(a); a.click(); a.remove();
+  };
+  const fe = document.getElementById('simFee');
+  if(fe) fe.onchange = () => { const v = parseNum(fe.value); if(v >= 0 && v < 5){ sim.fee = v; saveSim(); } renderSim(); };
+  const rs = document.getElementById('simReset');
+  if(rs) rs.onclick = () => {
+    const v = parseNum(document.getElementById('simStart').value);
+    if(!(v >= 100)){ alert('Başlangıç bakiyesi en az 100 TRY olmalı.'); return; }
+    if(!confirm('Tüm sanal işlemler ve sanal pozisyonlar silinsin, hesap ' + fmtMoney(v) + ' TRY ile yeniden başlasın mı?')) return;
+    positions = positions.filter(p => !p.sim); savePos();
+    sim = {start: v, cash: v, fee: sim.fee, trades: [], eq: [{t: Date.now(), v}], t0: Date.now()};
+    saveSim(); renderSim(); renderOpp();
+  };
+}
+chartHoverBind(document.getElementById('simBox'), () => renderSim());
+setInterval(() => { simSample(false); if(infoOpen === 'sim' && !chartHold && !document.activeElement.closest('#simBox')) renderSim(); }, 2000);
 
 // ================= SON DAKİKA + COİN ŞERİDİ =================
 const NEWS_EVERY = 30000, NEWS_MAX_AGE = 36 * 3600000;
@@ -2143,6 +2537,12 @@ function showHelp(){
       <div class="mhd">📰 Üst Şerit</div>
       <p>En üstte iki kayan şerit var. <b>📈 Piyasa</b>: hacmi en yüksek coinlerin canlı fiyat ve günlük değişimi (dokununca detay açılır). <b>🔴 SON DAKİKA</b>: internetteki kripto haberleri; her 30 saniyede yeniden kontrol edilir, en yeni başta gelir. Soldaki küçük etiket haberin kaç dakika önce çıktığını gösterir (30 dakikadan yeni olanlar kırmızı). Haberin üzerine fare ile gelince veya basılı tutunca şerit durur, tıklayınca kaynağı açılır. Haber bir coin içeriyorsa yanında o coinin canlı değişimi görünür. Piyasa şeridinde bir coinin fiyatı değişince o coinin adı ve değeri yeşil (artış) ya da kırmızı (düşüş) yanıp söner. Dış haber kaynaklarına ulaşılamazsa şerit boş kalmaz: canlı verilerden üretilen <b>Canlı Piyasa</b> başlıkları (günün en çok yükselen/düşenleri, alış-satışta ani %3+ hareketler) görünür. İngilizce haberler otomatik çeviriyle Türkçeleşir (çeviri kotası dolarsa <b>EN</b> etiketiyle orijinali görünür). Haberler yayıncıların RSS akışlarından ve halka açık aracı sunuculardan geldiği için yayın ile ekrana düşme arasında birkaç dakika gecikme olabilir.</p>
 
+      <div class="mhd">📈 Grafik İncelemesi</div>
+      <p>Detay penceresindeki ve Takibim kartındaki grafiklerin üzerinde fare ile gezinirseniz ya da telefonda parmağınızı kaydırırsanız o noktanın <b>saati ve fiyatı</b>, grafiğin başına (ve takipte alış fiyatına) göre ve önceki noktaya göre değişim görünür. Bu sırada grafik güncellenmeyi durdurur, bırakınca canlı akışa döner. Grafiğin solunda ilk, ortasında orta, sağında son zaman etiketi vardır.</p>
+
+      <div class="mhd">🧪 Sanal Al / Sat</div>
+      <p>Coin detay penceresindeki <b>Al</b> ve <b>Sat</b> düğmeleri gerçek para kullanmadan işlem simülasyonu yapar; düğmelerde canlı alış/satış fiyatı görünür. Alım piyasanın <b>satış (ask)</b> fiyatından, satım <b>alış (bid)</b> fiyatından gerçekleşir, böylece alış-satış farkı maliyeti de gerçekçi yansır; her işlemden komisyon (varsayılan %0,15, ayarlanabilir) düşülür. Başlangıç bakiyesi 100.000 TRY (ayarlanabilir). Alınan coinler <b>Takibim</b>'e 🧪 SANAL rozetiyle eklenir, zarar uyarısı eşiği geçilirse sesli uyarı gelir. <b>🧾 Sanal Hesap & Rapor</b> panelinde toplam varlık, gerçekleşen ve gerçekleşmemiş kâr/zarar, kazanma oranı, en büyük düşüş, komisyon ve fark maliyeti, coin bazında sonuç, işlem geçmişi ve duruma göre yazılan bir rapor özeti bulunur; raporu kopyalayabilir veya CSV olarak indirebilirsiniz. Gerçek piyasada emirler kaymayla farklı fiyattan gerçekleşebilir.</p>
+
       <div class="mhd">🗂️ Paneller</div>
       <p>Yatırım fırsatlarının altındaki dört düğme (%3+ Değişenler, Canlı Sıralama, Değişim Uyarıları, Teknik Sinyaller) ilgili paneli açar; aynı düğmeye veya ✕ Kapat'a basınca kapanır. Sayılar o paneldeki güncel kayıt sayısıdır.</p>
 
@@ -2174,6 +2574,7 @@ function updateInfoCounts(){
 }
 function setInfo(p){
   infoOpen = (infoOpen === p) ? null : p;
+  if(infoOpen === 'sim') renderSim();
   document.querySelectorAll('.ibtn').forEach(b => b.classList.toggle('on', b.dataset.p === infoOpen));
   document.querySelectorAll('.infopanel').forEach(c => { c.style.display = c.dataset.panel === infoOpen ? 'block' : 'none'; });
   if(infoOpen){
